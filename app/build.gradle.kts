@@ -69,6 +69,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    // Lottie animation
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+
     // Dagger
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")

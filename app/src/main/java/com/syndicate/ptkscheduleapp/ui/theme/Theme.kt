@@ -1,37 +1,48 @@
 package com.syndicate.ptkscheduleapp.ui.theme
 
 import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val FirstTheme = lightColorScheme(
-    onBackground = FirstThemeBackground
+private val firstTheme = lightColorScheme(
+    onPrimary = FirstThemeBackground,
+    inversePrimary = SecondThemeBackground
 )
 
-private val SecondTheme = lightColorScheme(
-    onBackground = SecondThemeBackground
+private val secondTheme = lightColorScheme(
+    onPrimary = SecondThemeBackground,
+    inversePrimary = FirstThemeBackground
+)
+
+private val thirdTheme = lightColorScheme(
+    onPrimary = ThirdThemeBackground,
+    inversePrimary = GrayThirdTheme
+)
+
+private val fourthTheme = lightColorScheme(
+    onPrimary = FourthThemeBackground,
+    inversePrimary = ThirdThemeBackground
 )
 
 @Composable
 fun PTKScheduleAppTheme(
-    colorScheme: ColorScheme = FirstTheme,
+    themeMode: ThemeMode = ThemeMode.FIRST,
     darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-
+    val colorScheme = when (themeMode) {
+        ThemeMode.FIRST -> firstTheme
+        ThemeMode.SECOND -> secondTheme
+        ThemeMode.THIRD -> thirdTheme
+        ThemeMode.FOURTH -> fourthTheme
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {

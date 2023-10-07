@@ -14,3 +14,7 @@ val FirstThemeBackground = Color(0xFFFFFFFF)
 val SecondThemeBackground = Color(0xFFF5F5F5)
 val ThirdThemeBackground = Color(0xFF212121)
 val FourthThemeBackground = Color(0xFF000000)
+
+val GrayThirdTheme = Color(0xFF5F5F5F)
+
+val MainBlue = Color(0xFF002FA7)

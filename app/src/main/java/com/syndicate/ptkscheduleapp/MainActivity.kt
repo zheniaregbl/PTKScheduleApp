@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.CourseSelectionScreen
+import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
 import com.syndicate.ptkscheduleapp.ui.theme.PTKScheduleAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,11 +32,19 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize(),
                     contentWindowInsets = WindowInsets.systemBars
                 ) { paddingValues ->
-                    CourseSelectionScreen(
+                    /*CourseSelectionScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            .padding(paddingValues)
+                    )*/
+                    SplashScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                             .padding(paddingValues)
                     )
