@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.CourseSelectionScreen
+import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.GroupSelectionScreen
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
 import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
 import com.syndicate.ptkscheduleapp.ui.theme.PTKScheduleAppTheme
@@ -33,14 +34,14 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize(),
                     contentWindowInsets = WindowInsets.systemBars
                 ) { paddingValues ->
-                    /*CourseSelectionScreen(
+                    CourseSelectionScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             .padding(paddingValues)
-                    )*/
+                    )
                     /*SplashScreen(
                         modifier = Modifier
                             .fillMaxSize()
@@ -49,14 +50,22 @@ class MainActivity : ComponentActivity() {
                             )
                             .padding(paddingValues)
                     )*/
-                    ScheduleScreen(
+                    /*ScheduleScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             .padding(paddingValues)
-                    )
+                    )*/
+                    /*GroupSelectionScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            .padding(paddingValues)
+                    )*/
                 }
             }
         }
