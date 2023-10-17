@@ -273,7 +273,7 @@ fun LessonInfo(
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(2.dp)
+                    .height(1.dp)
                     .background(
                         color = ThirdThemeBackground
                     )
