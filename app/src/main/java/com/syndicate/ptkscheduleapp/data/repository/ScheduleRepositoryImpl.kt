@@ -5,6 +5,7 @@ import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONObject
 import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(
@@ -18,5 +19,11 @@ class ScheduleRepositoryImpl @Inject constructor(
         )
 
         if (response.isSuccessful) JSONArray(response.body().toString()) else JSONArray()
+    }
+
+    override suspend fun getCurrentWeek(): JSONObject = withContext(Dispatchers.IO) {
+        val response = scheduleApi.getCurrentWeek()
+
+        if (response.isSuccessful) JSONObject(response.body().toString()) else JSONObject()
     }
 }

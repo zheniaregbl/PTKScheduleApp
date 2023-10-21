@@ -14,9 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
 import com.syndicate.ptkscheduleapp.ui.theme.PTKScheduleAppTheme
+import com.syndicate.ptkscheduleapp.view_model.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -33,6 +35,8 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
+            val viewModel = hiltViewModel<ScheduleViewModel>()
+
             PTKScheduleAppTheme {
                 Scaffold(
                     modifier = Modifier
