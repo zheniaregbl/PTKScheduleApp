@@ -30,10 +30,12 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.ui.theme.MainBlue
+import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToNext: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(resId = R.raw.yaroslav_lottie)
@@ -55,8 +57,11 @@ fun SplashScreen(
         if (progress == 1f) {
             isPlaying = false
             showDevs.value = "from syndicate"
-        }
 
+            delay(1000L)
+
+            navigateToNext()
+        }
     }
 
     Box(
@@ -84,7 +89,7 @@ fun SplashScreen(
         ) {
             Crossfade(
                 targetState = showDevs.value,
-                animationSpec = tween(250),
+                animationSpec = tween(100),
                 label = ""
             ) { showDevs ->
                 Text(
