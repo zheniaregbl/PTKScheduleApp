@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -61,13 +62,10 @@ fun SplashScreen(
     Box(
         modifier = modifier
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = 344.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             LottieAnimation(
                 modifier = Modifier
@@ -75,10 +73,15 @@ fun SplashScreen(
                 composition = composition,
                 progress = { progress }
             )
-            Spacer(
-                modifier = Modifier
-                    .height(200.dp)
-            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    50.dp
+                ),
+            contentAlignment = Alignment.Center
+        ) {
             Crossfade(
                 targetState = showDevs.value,
                 animationSpec = tween(250),

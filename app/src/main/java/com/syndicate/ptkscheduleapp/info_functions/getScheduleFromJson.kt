@@ -23,21 +23,22 @@ fun getScheduleFromJson(
                 scheduleList.add(tempList)
 
                 tempList = ArrayList()
+
                 currentDayOfWeek = tempDayOfWeek
             }
         }
 
-        if (onePair.getString(JsonFieldName.subject).isNotEmpty()) {
-            val lessonItem = LessonItem(
-                time = onePair.getString(JsonFieldName.time),
-                lessonTitle = onePair.getString(JsonFieldName.subject),
-                teacher = onePair.getString(JsonFieldName.teacher),
-                room = onePair.getString(JsonFieldName.room),
-                subgroupNumber = onePair.getInt(JsonFieldName.subgroupNumber)
-            )
+        val lessonItem = LessonItem(
+            time = onePair.getString(JsonFieldName.time),
+            lessonTitle = onePair.getString(JsonFieldName.subject),
+            teacher = onePair.getString(JsonFieldName.teacher),
+            room = onePair.getString(JsonFieldName.room),
+            pairNumber = onePair.getInt(JsonFieldName.pairNumber),
+            isUpper = onePair.getBoolean(JsonFieldName.isUpper),
+            subgroupNumber = onePair.getInt(JsonFieldName.subgroupNumber)
+        )
 
-            tempList.add(lessonItem)
-        }
+        tempList.add(lessonItem)
     }
 
     scheduleList.add(tempList)

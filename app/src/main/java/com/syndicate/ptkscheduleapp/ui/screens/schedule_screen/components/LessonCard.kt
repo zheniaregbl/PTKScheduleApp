@@ -94,7 +94,7 @@ fun LessonCard(
                     LessonInfo(
                         lessonItem = lessonItem,
                         isDivision = true,
-                        subgroup = index + 1,
+                        subgroup = lessonItem.subgroupNumber,
                         isLast = index == lessonList.lastIndex
                     )
                 }
@@ -142,7 +142,7 @@ fun LessonInfo(
                 .height(3.dp)
         )
         Text(
-            text = "${lessonItem.teacher}, ${lessonItem.room}",
+            text = "${lessonItem.teacher}, кабинет ${lessonItem.room}",
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,

@@ -5,10 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
+import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.info_functions.getScheduleFromJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,23 +20,37 @@ class ScheduleViewModel @Inject constructor(
     private val repository: ScheduleRepository
 ): ViewModel() {
 
-    private var _listLessonsOnWeek = MutableLiveData<List<List<LessonItem>>>()
-    var listLessonsOnWeek:LiveData<List<List<LessonItem>>> = _listLessonsOnWeek
+    val state = MutableStateFlow(MainState())
+    private var _scheduleList = MutableLiveData<List<List<LessonItem>>>()
+    var scheduleList: LiveData<List<List<LessonItem>>> = _scheduleList
 
     init {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val scheduleJson = repository.getScheduleOnWeek("1991")
-            val schedule = getScheduleFromJson(scheduleJson)
-            _listLessonsOnWeek.postValue(schedule)
-        }
+        initState()
+        initLiveData()
     }
 
     fun onEvent(event: ScheduleEvent) {
         when (event) {
             ScheduleEvent.GetScheduleOnWeek -> {
-
+                initState()
+                initLiveData()
             }
+        }
+    }
+
+    private fun initLiveData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val scheduleJson = repository.getScheduleOnWeek("1991")
+            val schedule = getScheduleFromJson(scheduleJson)
+            _scheduleList.postValue(schedule)
+        }
+    }
+
+    private fun initState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.update { it.copy(
+                isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+            ) }
         }
     }
 }

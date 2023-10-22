@@ -3,5 +3,6 @@ package com.syndicate.ptkscheduleapp.data.model
 import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 
 data class MainState(
-    val colorThemeMode: ThemeMode
+    val colorThemeMode: ThemeMode = ThemeMode.FIRST,
+    val isUpperWeek: Boolean = true
 )
