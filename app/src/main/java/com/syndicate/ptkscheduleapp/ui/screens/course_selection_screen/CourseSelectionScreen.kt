@@ -2,11 +2,11 @@ package com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,45 +39,60 @@ fun CourseSelectionScreen(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Выберите курс",
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(96.dp)
-            )
-            SelectionCourseSection(
-                radioOptions = radioOptions,
-                radioState = radioState
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(50.dp)
-            )
-            SimpleButton(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = SecondThemeBackground
-                    )
-                    .padding(
-                        horizontal = 82.dp,
-                        vertical = 18.dp
-                    ),
-                onClick = navigateToNext,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Normal,
-                textColor = Color.Black
-            )
+
+            item {
+                Text(
+                    text = "Выберите курс",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
+                )
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .height(96.dp)
+                )
+            }
+
+            item {
+                SelectionCourseSection(
+                    radioOptions = radioOptions,
+                    radioState = radioState
+                )
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .height(50.dp)
+                )
+            }
+
+            item {
+                SimpleButton(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            color = SecondThemeBackground
+                        )
+                        .padding(
+                            horizontal = 82.dp,
+                            vertical = 18.dp
+                        ),
+                    onClick = navigateToNext,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Normal,
+                    textColor = Color.Black
+                )
+            }
         }
     }
 }

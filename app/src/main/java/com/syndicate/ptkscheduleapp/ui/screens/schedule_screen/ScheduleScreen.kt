@@ -101,11 +101,12 @@ fun ScheduleScreen(
     var listSeveralLessons = ArrayList<LessonItem>()
 
     Box(
-        modifier = modifier
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(
                     horizontal = 16.dp
                 ),

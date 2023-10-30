@@ -1,5 +1,8 @@
 package com.syndicate.ptkscheduleapp.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,7 +36,13 @@ fun AppNavigation(
         startDestination = ScreenRoute.RoleSelectionScreen.route
     ) {
         composable(
-            route = ScreenRoute.SplashScreen.route
+            route = ScreenRoute.SplashScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
             SplashScreen(
                 modifier = Modifier
@@ -50,7 +59,13 @@ fun AppNavigation(
             )
         }
         composable(
-            route = ScreenRoute.RoleSelectionScreen.route
+            route = ScreenRoute.RoleSelectionScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
             RoleSelectionScreen(
                 modifier = Modifier
@@ -73,7 +88,13 @@ fun AppNavigation(
             )
         }
         composable(
-            route = ScreenRoute.CourseSelectionScreen.route
+            route = ScreenRoute.CourseSelectionScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
             CourseSelectionScreen(
                 modifier = Modifier
@@ -87,7 +108,13 @@ fun AppNavigation(
             )
         }
         composable(
-            route = ScreenRoute.GroupSelectionScreen.route
+            route = ScreenRoute.GroupSelectionScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
             GroupSelectionScreen(
                 modifier = Modifier
@@ -102,7 +129,13 @@ fun AppNavigation(
             )
         }
         composable(
-            route = ScreenRoute.ScheduleScreen.route
+            route = ScreenRoute.ScheduleScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
         ) {
             ScheduleScreen(
                 modifier = Modifier
