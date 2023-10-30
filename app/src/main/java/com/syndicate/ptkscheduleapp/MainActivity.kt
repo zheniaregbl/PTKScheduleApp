@@ -39,25 +39,6 @@ class MainActivity : ComponentActivity() {
                     viewModel = viewModel
                 )
             }
-
-/*            CourseSelectionScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-            )*/
         }
     }
 }
-
-
-
-/*GroupSelectionScreen(
-    modifier = Modifier
-        .fillMaxSize()
-        .background(
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-        .padding(paddingValues)
-)*/

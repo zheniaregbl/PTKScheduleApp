@@ -21,13 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
 import com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.components.SelectionRoleSection
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
+import com.syndicate.ptkscheduleapp.view_model.ScheduleEvent
 
 @Composable
 fun RoleSelectionScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToNext: (UserMode) -> Unit = { },
+    changeUserMode: (UserMode) -> Unit = { }
 ) {
     val radioOptions = listOf("Студент", "Преподаватель")
     val radioState = remember {
@@ -35,14 +39,12 @@ fun RoleSelectionScreen(
     }
 
     Box(
-        modifier = modifier
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = 150.dp
-                ),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -85,7 +87,13 @@ fun RoleSelectionScreen(
                         horizontal = 82.dp,
                         vertical = 18.dp
                     ),
-                onClick = { },
+                onClick = {
+                    val userMode = if (radioState.value == "Студент") UserMode.Student
+                                    else UserMode.Teacher
+
+                    changeUserMode(userMode)
+                    navigateToNext(userMode)
+                },
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Normal,
                 textColor = Color.Black

@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -45,6 +46,7 @@ fun GroupPicker(
     visibleItemsCount: Int = 5,
     textModifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
+    fontSize: TextUnit = 40.sp,
     dividerColor: Color = LocalContentColor.current,
 ) {
 
@@ -93,7 +95,7 @@ fun GroupPicker(
                     overflow = TextOverflow.Ellipsis,
                     style = textStyle,
                     color = Color.Black,
-                    fontSize = 40.sp,
+                    fontSize = fontSize,
                     modifier = Modifier
                         .onSizeChanged { size -> itemHeightPixels.value = size.height }
                         .then(textModifier)
