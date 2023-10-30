@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components
+package com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.components
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
 
 @Composable
-fun SelectionCourseSection(
+fun SelectionRoleSection(
     modifier: Modifier = Modifier,
-    radioOptions: List<String> = listOf("1 курс", "2 курс", "3 курс", "4 курс"),
-    radioState: MutableState<Int> = mutableIntStateOf(1)
+    radioOptions: List<String> = listOf("Студент", "Преподаватель"),
+    radioState: MutableState<String> = mutableStateOf("Студент")
 ) {
     Column(
         modifier = modifier
@@ -44,8 +44,8 @@ fun SelectionCourseSection(
                 modifier = Modifier
                     .height(30.dp)
                     .selectable(
-                        selected = ("${radioState.value} курс" == label),
-                        onClick = { radioState.value = label[0].toString().toInt() },
+                        selected = (radioState.value == label),
+                        onClick = { radioState.value = label },
                         role = Role.RadioButton
                     ),
                 verticalAlignment = Alignment.CenterVertically
@@ -59,7 +59,7 @@ fun SelectionCourseSection(
                         modifier = Modifier
                             .size(30.dp),
                         imageVector = ImageVector.vectorResource(
-                            id = if ("$targetState курс" == label)
+                            id = if (targetState == label)
                                 R.drawable.svg_radio_checked else R.drawable.svg_radio_default
                         ),
                         contentDescription = null
@@ -87,6 +87,6 @@ fun SelectionCourseSection(
 
 @Preview(showBackground = false)
 @Composable
-fun PreviewSelectionCourseSection() {
-    SelectionCourseSection()
+fun PreviewSelectionRoleSection() {
+    SelectionRoleSection()
 }

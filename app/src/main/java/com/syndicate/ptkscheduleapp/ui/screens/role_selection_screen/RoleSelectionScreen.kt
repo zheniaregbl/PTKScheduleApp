@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen
+package com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,17 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SelectionCourseSection
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
+import com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.components.SelectionRoleSection
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
 
 @Composable
-fun CourseSelectionScreen(
+fun RoleSelectionScreen(
     modifier: Modifier = Modifier
 ) {
-    val radioOptions = listOf("1 курс", "2 курс", "3 курс", "4 курс")
+    val radioOptions = listOf("Студент", "Преподаватель")
     val radioState = remember {
-        mutableIntStateOf(1)
+        mutableStateOf("Студент")
     }
 
     Box(
@@ -46,7 +46,18 @@ fun CourseSelectionScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Выберите ваш курс",
+                text = "Здравствуйте!",
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Black
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(16.dp)
+            )
+            Text(
+                text = "Выберите роль",
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Normal,
@@ -56,7 +67,7 @@ fun CourseSelectionScreen(
                 modifier = Modifier
                     .height(96.dp)
             )
-            SelectionCourseSection(
+            SelectionRoleSection(
                 radioOptions = radioOptions,
                 radioState = radioState
             )
@@ -83,10 +94,8 @@ fun CourseSelectionScreen(
     }
 }
 
-@Preview(
-    showBackground = true
-)
+@Preview(showBackground = true)
 @Composable
-fun PreviewCourseSelectionScreen() {
-    CourseSelectionScreen()
+fun PreviewRoleSelectionScreen() {
+    RoleSelectionScreen()
 }

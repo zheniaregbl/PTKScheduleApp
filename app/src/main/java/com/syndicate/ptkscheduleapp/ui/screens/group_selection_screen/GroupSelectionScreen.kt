@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -14,22 +15,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.GroupPicker
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.rememberPickerState
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 
 @Composable
 fun GroupSelectionScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userMode: UserMode = UserMode.Student
 ) {
-    val values = remember { (1..99).map { it.toString() } }
     val valuesPickerState = rememberPickerState()
-    val listGroup = listOf(
+    val listGroup = if (userMode == UserMode.Student) listOf(
         "1991", "1992", "1993", "1994", "1995",
         "1996", "1997", "1998", "1999", "1990"
+    ) else listOf(
+        "Цымбалюк Л.Н.", "Кручинина О.А.", "Сазонова Н.В.", "Дубогрей А.Е."
     )
 
     Box(
@@ -44,11 +49,17 @@ fun GroupSelectionScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Выберите группу",
+                text = if (userMode == UserMode.Student) "Выберите группу"
+                    else "Выберите\nпреподавателя",
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color.Black
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(70.dp)
             )
             GroupPicker(
                 state = valuesPickerState,

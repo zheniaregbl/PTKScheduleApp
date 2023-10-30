@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.MainState
+import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.info_functions.getScheduleFromJson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,9 +32,14 @@ class ScheduleViewModel @Inject constructor(
 
     fun onEvent(event: ScheduleEvent) {
         when (event) {
+
             ScheduleEvent.GetScheduleOnWeek -> {
                 initState()
                 initLiveData()
+            }
+
+            is ScheduleEvent.ChangeUserMode -> {
+                changeUserMode(event.newUserMode)
             }
         }
     }
@@ -50,6 +56,14 @@ class ScheduleViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             state.update { it.copy(
                 isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+            ) }
+        }
+    }
+
+    private fun changeUserMode(newUserMode: UserMode) {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.update { it.copy(
+                userMode = newUserMode
             ) }
         }
     }
