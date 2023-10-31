@@ -1,5 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,8 @@ import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import java.util.Random
+import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun LessonCard(
@@ -179,20 +182,18 @@ fun LessonInfo(
 fun ColorLine(
     modifier: Modifier = Modifier
 ) {
-    val rnd = Random()
-    val intColor = android.graphics.Color.argb(
-        255,
-        rnd.nextInt(256),
-        rnd.nextInt(256),
-        rnd.nextInt(256)
-    )
+    val hsl = generateColor()
 
     Spacer(
         modifier = modifier
             .width(5.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(
-                color = Color(intColor)
+                color = Color.hsl(
+                    hue = hsl.first,
+                    saturation = if (hsl.second > 0.75f) 0.75f else hsl.second,
+                    lightness = if (hsl.third < 0.6f) 0.6f else hsl.third
+                )
             )
     )
 }
@@ -210,10 +211,50 @@ fun PreviewLessonCardOneLesson() {
 fun PreviewLessonCardSomeLesson() {
     LessonCard(
         lessonList = listOf(
-            LessonItem(
-                lessonTitle = "Основы программирования и конфигурирования в корпоративных информационных системах на платформе 1С:Предприятие"
-            ),
+            LessonItem(),
             LessonItem()
         )
     )
+}
+
+fun generateColor(): Triple<Float, Float, Float> {
+    val rnd = Random()
+    val intColor = android.graphics.Color.argb(
+        255,
+        rnd.nextInt(256),
+        rnd.nextInt(256),
+        rnd.nextInt(256)
+    )
+
+    return Color(intColor).toHsl()
+}
+
+fun Color.toHsl(): Triple<Float, Float, Float> {
+    val r = red
+    val g = green
+    val b = blue
+
+    val max = max(r, max(g, b))
+    val min = min(r, min(g, b))
+
+    val h: Float
+    val s: Float
+    val l = (max + min) / 2
+
+    if (max == min) {
+        // achromatic
+        h = 0f
+        s = 0f
+    } else {
+        val d = max - min
+        s = if (l > 0.5f) d / (2 - max - min) else d / (max + min)
+        h = when (max) {
+            r -> (g - b) / d + (if (g < b) 6 else 0)
+            g -> (b - r) / d + 2
+            b -> (r - g) / d + 4
+            else -> 0f
+        }
+    }
+
+    return Triple(h * 60, s, l)
 }
