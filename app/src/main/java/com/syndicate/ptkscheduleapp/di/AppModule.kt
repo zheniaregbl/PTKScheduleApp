@@ -1,5 +1,7 @@
 package com.syndicate.ptkscheduleapp.di
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.syndicate.ptkscheduleapp.core.AppConstants
 import com.syndicate.ptkscheduleapp.data.remote.ScheduleApi
 import com.syndicate.ptkscheduleapp.data.repository.ScheduleRepositoryImpl
@@ -7,6 +9,7 @@ import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -30,5 +33,11 @@ object AppModule {
     @Singleton
     fun provideScheduleRepository(scheduleApi: ScheduleApi): ScheduleRepository {
         return ScheduleRepositoryImpl(scheduleApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("app_configuration", Context.MODE_PRIVATE)
     }
 }

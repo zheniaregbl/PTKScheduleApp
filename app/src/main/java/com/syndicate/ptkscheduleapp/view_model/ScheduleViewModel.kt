@@ -1,5 +1,7 @@
 package com.syndicate.ptkscheduleapp.view_model
 
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
-    private val repository: ScheduleRepository
+    private val repository: ScheduleRepository,
+    private val sharedPreferences: SharedPreferences
 ): ViewModel() {
 
     val state = MutableStateFlow(MainState())
@@ -41,6 +44,10 @@ class ScheduleViewModel @Inject constructor(
             is ScheduleEvent.ChangeUserMode -> {
                 changeUserMode(event.newUserMode)
             }
+
+            ScheduleEvent.CreateConfiguration -> {
+                createConfiguration()
+            }
         }
     }
 
@@ -54,8 +61,11 @@ class ScheduleViewModel @Inject constructor(
 
     private fun initState() {
         viewModelScope.launch(Dispatchers.IO) {
+            val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
+
             state.update { it.copy(
-                isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+                isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper"),
+                isFirstStart = isFirstStart
             ) }
         }
     }
@@ -65,6 +75,12 @@ class ScheduleViewModel @Inject constructor(
             state.update { it.copy(
                 userMode = newUserMode
             ) }
+        }
+    }
+
+    private fun createConfiguration() {
+        viewModelScope.launch(Dispatchers.IO) {
+            sharedPreferences.edit().putInt("firstStart", 0).apply()
         }
     }
 }

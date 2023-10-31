@@ -35,7 +35,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
-    navigateToNext: () -> Unit = { }
+    isFirstStart: Boolean = true,
+    navigateToRole: () -> Unit = { },
+    navigateToSchedule: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(resId = R.raw.yaroslav_lottie)
@@ -60,7 +62,7 @@ fun SplashScreen(
 
             delay(1000L)
 
-            navigateToNext()
+            if (isFirstStart) navigateToRole() else navigateToSchedule()
         }
     }
 

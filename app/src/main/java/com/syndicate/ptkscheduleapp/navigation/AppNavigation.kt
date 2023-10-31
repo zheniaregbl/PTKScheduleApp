@@ -33,8 +33,9 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenRoute.RoleSelectionScreen.route
+        startDestination = ScreenRoute.SplashScreen.route
     ) {
+
         composable(
             route = ScreenRoute.SplashScreen.route,
             enterTransition = {
@@ -51,13 +52,20 @@ fun AppNavigation(
                     .padding(
                         top = 10.dp
                     ),
-                navigateToNext = {
+                isFirstStart = state.isFirstStart,
+                navigateToRole = {
                     navController.navigate(ScreenRoute.RoleSelectionScreen.route) {
+                        popUpTo(0)
+                    }
+                },
+                navigateToSchedule = {
+                    navController.navigate(ScreenRoute.ScheduleScreen.route) {
                         popUpTo(0)
                     }
                 }
             )
         }
+
         composable(
             route = ScreenRoute.RoleSelectionScreen.route,
             enterTransition = {
@@ -87,6 +95,7 @@ fun AppNavigation(
                 }
             )
         }
+
         composable(
             route = ScreenRoute.CourseSelectionScreen.route,
             enterTransition = {
@@ -107,6 +116,7 @@ fun AppNavigation(
                 }
             )
         }
+
         composable(
             route = ScreenRoute.GroupSelectionScreen.route,
             enterTransition = {
@@ -121,6 +131,8 @@ fun AppNavigation(
                     .fillMaxSize()
                     .padding(paddingValues),
                 navigateToNext = {
+                    viewModel.onEvent(ScheduleEvent.CreateConfiguration)
+
                     navController.navigate(ScreenRoute.ScheduleScreen.route) {
                         popUpTo(0)
                     }
@@ -128,6 +140,7 @@ fun AppNavigation(
                 userMode = state.userMode
             )
         }
+
         composable(
             route = ScreenRoute.ScheduleScreen.route,
             enterTransition = {
