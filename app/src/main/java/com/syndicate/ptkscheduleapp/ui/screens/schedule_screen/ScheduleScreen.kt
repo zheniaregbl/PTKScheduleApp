@@ -2,6 +2,7 @@ package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -99,20 +100,24 @@ fun ScheduleScreen(
     }
 
     var listSeveralLessons = ArrayList<LessonItem>()
+    var prevLessonNumber = -1
 
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+        modifier = modifier
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(
                     horizontal = 16.dp
                 ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             itemsIndexed(currentSchedule) { index, item ->
+
+                if (index != 0) prevLessonNumber = currentSchedule[index - 1].pairNumber
+
                 if (item.lessonTitle != "") {
                     if (item.subgroupNumber == 0) {
                         LessonCard(
@@ -140,7 +145,8 @@ fun ScheduleScreen(
                         listSeveralLessons.add(item)
 
                         if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
-                            || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()) {
+                            || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
+                            || index != 0 && prevLessonNumber == item.pairNumber) {
                             LessonCard(
                                 modifier = Modifier
                                     .fillMaxWidth()

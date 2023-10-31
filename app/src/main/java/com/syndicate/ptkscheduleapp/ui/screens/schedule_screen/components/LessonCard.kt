@@ -118,6 +118,7 @@ fun LessonInfo(
     Column(
         modifier = Modifier
             .padding(vertical = 2.dp)
+            .padding(end = 50.dp)
     ) {
         Text(
             text = lessonItem.time,
@@ -209,7 +210,9 @@ fun PreviewLessonCardOneLesson() {
 fun PreviewLessonCardSomeLesson() {
     LessonCard(
         lessonList = listOf(
-            LessonItem(),
+            LessonItem(
+                lessonTitle = "Основы программирования и конфигурирования в корпоративных информационных системах на платформе 1С:Предприятие"
+            ),
             LessonItem()
         )
     )
