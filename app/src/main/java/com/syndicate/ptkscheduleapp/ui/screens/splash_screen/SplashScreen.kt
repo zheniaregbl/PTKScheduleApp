@@ -40,7 +40,7 @@ fun SplashScreen(
     navigateToSchedule: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(resId = R.raw.yaroslav_lottie)
+        spec = LottieCompositionSpec.RawRes(resId = R.raw.yaroslav_lottie_blue)
     )
     var isPlaying by remember {
         mutableStateOf(true)
@@ -52,7 +52,7 @@ fun SplashScreen(
         composition =  composition,
         isPlaying = isPlaying,
         iterations = 1,
-        speed = 0.5f
+        speed = 0.45f
     )
 
     LaunchedEffect(key1 = progress) {
@@ -91,7 +91,7 @@ fun SplashScreen(
         ) {
             Crossfade(
                 targetState = showDevs.value,
-                animationSpec = tween(100),
+                animationSpec = tween(500),
                 label = ""
             ) { showDevs ->
                 Text(

@@ -153,10 +153,7 @@ fun AppNavigation(
             ScheduleScreen(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(
-                        top = 10.dp
-                    ),
+                    .padding(paddingValues),
                 isUpperWeek = state.isUpperWeek,
                 scheduleList = scheduleList
             )

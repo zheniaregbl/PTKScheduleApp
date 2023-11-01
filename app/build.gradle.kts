@@ -89,13 +89,8 @@ dependencies {
     testImplementation("com.google.dagger:hilt-android-testing:2.48")
     kaptTest("com.google.dagger:hilt-compiler:2.48")
 
-    // System navigation ui
-    implementation("com.google.accompanist:accompanist-insets:0.15.0")
-    implementation("com.google.accompanist:accompanist-insets-ui:0.15.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.15.0")
-
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.3")
+    implementation("androidx.navigation:navigation-compose:2.7.4")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
