@@ -1,6 +1,7 @@
 package com.syndicate.ptkscheduleapp
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.navigation.AppNavGraph
 import com.syndicate.ptkscheduleapp.ui.theme.PTKScheduleAppTheme
+import com.syndicate.ptkscheduleapp.ui.utils.LockScreenOrientation
 import com.syndicate.ptkscheduleapp.view_model.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -33,6 +35,11 @@ class MainActivity : ComponentActivity() {
             val scheduleList = viewModel.scheduleList.observeAsState()
 
             PTKScheduleAppTheme {
+
+                LockScreenOrientation(
+                    orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                )
+
                 AppNavGraph(
                     state = state,
                     scheduleList = scheduleList.value,
