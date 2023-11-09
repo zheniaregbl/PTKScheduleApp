@@ -1,6 +1,8 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.info_functions.filterSchedule
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import java.util.Calendar
@@ -123,7 +132,7 @@ fun ScheduleScreen(
             item { 
                 Spacer(
                     modifier = Modifier
-                        .height(110.dp)
+                        .height(140.dp)
                 )
             }
             
@@ -189,27 +198,10 @@ fun ScheduleScreen(
             }
         }
 
-        Box(
+        TopDatePanel(
             modifier = Modifier
                 .fillMaxSize()
-        ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .clip(
-                            RoundedCornerShape(
-                                bottomStart = 25.dp,
-                                bottomEnd = 25.dp
-                            )
-                        )
-                        .background(
-                            color = GrayText
-                        )
-                )
-            }
-        }
+        )
     }
 }
 

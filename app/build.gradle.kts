@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.syndicate.ptkscheduleapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "0.0.2a"

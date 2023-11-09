@@ -33,7 +33,7 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenRoute.SplashScreen.route
+        startDestination = ScreenRoute.ScheduleScreen.route
     ) {
 
         composable(
