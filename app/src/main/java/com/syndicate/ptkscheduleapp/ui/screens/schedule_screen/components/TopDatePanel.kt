@@ -4,6 +4,10 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Ease
+import androidx.compose.animation.core.EaseOutQuad
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -130,8 +134,6 @@ fun TopDatePanel(
                     MutableInteractionSource()
                 }
             ) {
-
-
                 if (panelState == PanelState.CalendarPanel) panelState = PanelState.WeekPanel
             }
             .composed { modifier }
@@ -226,6 +228,12 @@ fun TopDatePanel(
                         }
                     )
                 }
+                .animateContentSize(
+                    animationSpec = tween(
+                        durationMillis = 120,
+                        easing = EaseOutQuad
+                    )
+                )
         ) {
             Column(
                 modifier = Modifier
@@ -481,7 +489,10 @@ fun Calendar(
     ) {
         HorizontalPager(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 30.dp
+                ),
             state = pagerState
         ) { page ->
             val monthDates = months[page]
@@ -496,10 +507,7 @@ fun Calendar(
 
                     WeekRow(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 30.dp
-                            ),
+                            .fillMaxWidth(),
                         week = week,
                         selectedDate = selectedDate
                     )
