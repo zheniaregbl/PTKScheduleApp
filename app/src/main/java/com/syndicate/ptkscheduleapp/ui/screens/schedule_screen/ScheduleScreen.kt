@@ -3,6 +3,7 @@ package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
@@ -34,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
+import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.info_functions.filterSchedule
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
@@ -68,6 +71,10 @@ fun ScheduleScreen(
 ) {
     val calendar = Calendar.getInstance()
     val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+    val topDatePanelState = remember {
+        mutableStateOf(PanelState.WeekPanel)
+    }
 
     val list = scheduleList
         ?: listOf(
@@ -118,7 +125,17 @@ fun ScheduleScreen(
     var prevLessonNumber = -1
 
     Box(
-        modifier = modifier
+        modifier = Modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember {
+                    MutableInteractionSource()
+                }
+            ) {
+                if (topDatePanelState.value == PanelState.CalendarPanel)
+                    topDatePanelState.value = PanelState.WeekPanel
+            }
+            .composed { modifier }
     ) {
         LazyColumn(
             modifier = Modifier
@@ -128,14 +145,14 @@ fun ScheduleScreen(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            
-            item { 
+
+            item {
                 Spacer(
                     modifier = Modifier
                         .height(140.dp)
                 )
             }
-            
+
             itemsIndexed(currentSchedule) { index, item ->
 
                 if (index != 0) prevLessonNumber = currentSchedule[index - 1].pairNumber
@@ -154,7 +171,8 @@ fun ScheduleScreen(
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
                                     color = FirstThemeBackground
-                                ),
+                                )
+                                .clickable { },
                             lessonItem = item
                         )
 
@@ -196,11 +214,19 @@ fun ScheduleScreen(
                     }
                 }
             }
+
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .height(20.dp)
+                )
+            }
         }
 
         TopDatePanel(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            panelState = topDatePanelState
         )
     }
 }

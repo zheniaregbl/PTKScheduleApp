@@ -1,13 +1,10 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Ease
 import androidx.compose.animation.core.EaseOutQuad
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,10 +17,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -69,7 +64,8 @@ import kotlin.math.abs
 @Composable
 fun TopDatePanel(
     modifier: Modifier = Modifier
-        .fillMaxSize()
+        .fillMaxSize(),
+    panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel)
 ) {
     val dateState = remember {
         mutableStateOf(LocalDate.now())
@@ -88,11 +84,8 @@ fun TopDatePanel(
     var direction by remember {
         mutableStateOf(SwipeDirection.UP)
     }
-    var panelState by remember {
-        mutableStateOf(PanelState.WeekPanel)
-    }
     val colorShadow by animateColorAsState(
-        targetValue = if (panelState == PanelState.CalendarPanel)
+        targetValue = if (panelState.value == PanelState.CalendarPanel)
             Color.Black.copy(alpha = 0.35f) else Color.Transparent,
         animationSpec = tween(300, easing = LinearEasing),
         label = ""
@@ -128,14 +121,6 @@ fun TopDatePanel(
             .background(
                 color = colorShadow
             )
-            .clickable(
-                indication = null,
-                interactionSource = remember {
-                    MutableInteractionSource()
-                }
-            ) {
-                if (panelState == PanelState.CalendarPanel) panelState = PanelState.WeekPanel
-            }
             .composed { modifier }
     ) {
         Box(
@@ -202,8 +187,8 @@ fun TopDatePanel(
                         MutableInteractionSource()
                     }
                 ) {
-                    if (panelState == PanelState.CalendarPanel)
-                        panelState = PanelState.CalendarPanel
+                    if (panelState.value == PanelState.CalendarPanel)
+                        panelState.value = PanelState.CalendarPanel
                 }
                 .pointerInput(Unit) {
                     detectDragGestures(
@@ -221,7 +206,7 @@ fun TopDatePanel(
                             }
                         },
                         onDragEnd = {
-                            panelState = when (direction) {
+                            panelState.value = when (direction) {
                                 SwipeDirection.UP -> PanelState.WeekPanel
                                 SwipeDirection.DOWN -> PanelState.CalendarPanel
                             }
@@ -253,7 +238,7 @@ fun TopDatePanel(
                         Text(
                             text = "${monthText.value}, ${yearText.intValue}",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 16.sp,
+                            fontSize = 17.sp,
                             fontWeight = FontWeight.Normal,
                             color = Color.Black
                         )
@@ -277,7 +262,7 @@ fun TopDatePanel(
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 13.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = GrayThirdTheme
                             )
@@ -285,7 +270,7 @@ fun TopDatePanel(
                     }
                 }
 
-                AnimatedVisibility(visible = panelState == PanelState.WeekPanel) {
+                AnimatedVisibility(visible = panelState.value == PanelState.WeekPanel) {
 
                     WeekPanel(
                         modifier = Modifier
@@ -303,9 +288,7 @@ fun TopDatePanel(
                     )
                 }
 
-                AnimatedVisibility(
-                    visible = panelState == PanelState.CalendarPanel
-                ) {
+                AnimatedVisibility(visible = panelState.value == PanelState.CalendarPanel) {
                     Box(
                         modifier = Modifier
                             .padding(
@@ -420,7 +403,7 @@ fun WeekPanel(
                         Text(
                             text = date.dayOfMonth.toString(),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 13.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
                             color = GrayThirdTheme
                         )
@@ -584,7 +567,7 @@ fun DayItem(
             Text(
                 text = value.dayOfMonth.toString(),
                 style = MaterialTheme.typography.bodyMedium,
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = GrayThirdTheme
             )
@@ -599,7 +582,7 @@ fun DayItem(
             Text(
                 text = "",
                 style = MaterialTheme.typography.bodyMedium,
-                fontSize = 13.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = GrayThirdTheme
             )

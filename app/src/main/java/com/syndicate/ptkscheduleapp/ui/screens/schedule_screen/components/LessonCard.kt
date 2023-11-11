@@ -112,7 +112,7 @@ fun LessonInfo(
         time = "8.30-10.10",
         lessonTitle = "Математика",
         teacher = "Ширина",
-        room = "кабинет 410"
+        room = "410"
     ),
     isDivision: Boolean = false,
     subgroup: Int = 1,
@@ -145,13 +145,14 @@ fun LessonInfo(
             modifier = Modifier
                 .height(3.dp)
         )
-        Text(
-            text = "${lessonItem.teacher}, кабинет ${lessonItem.room}",
-            style = MaterialTheme.typography.bodyMedium,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.Black
-        )
+        if (lessonItem.teacher != "Не указан" && lessonItem.room != "Не указан")
+            Text(
+                text = "${lessonItem.teacher}, кабинет ${lessonItem.room}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Black
+            )
         if (isDivision) {
             Text(
                 text = "п/г $subgroup",
