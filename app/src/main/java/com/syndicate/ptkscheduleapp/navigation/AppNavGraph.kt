@@ -12,14 +12,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.MainState
-import com.syndicate.ptkscheduleapp.view_model.ScheduleViewModel
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     state: MainState,
-    scheduleList: List<List<LessonItem>>?,
-    viewModel: ScheduleViewModel
+    viewModel: MainViewModel
 ) {
     Scaffold(
         modifier = Modifier
@@ -32,7 +31,6 @@ fun AppNavGraph(
         AppNavigation(
             navController = navController,
             state = state,
-            scheduleList = scheduleList,
             viewModel = viewModel,
             paddingValues = paddingValues
         )

@@ -20,20 +20,19 @@ import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.GroupSelec
 import com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.RoleSelectionScreen
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
 import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
-import com.syndicate.ptkscheduleapp.view_model.ScheduleEvent
-import com.syndicate.ptkscheduleapp.view_model.ScheduleViewModel
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainEvent
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     state: MainState,
-    scheduleList: List<List<LessonItem>>?,
-    viewModel: ScheduleViewModel,
+    viewModel: MainViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreenRoute.ScheduleScreen.route
+        startDestination = ScreenRoute.SplashScreen.route
     ) {
 
         composable(
@@ -42,7 +41,7 @@ fun AppNavigation(
                 fadeIn(animationSpec = tween(400))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(800))
             }
         ) {
             SplashScreen(
@@ -91,7 +90,7 @@ fun AppNavigation(
                     }
                 },
                 changeUserMode = { userMode ->
-                    viewModel.onEvent(ScheduleEvent.ChangeUserMode(userMode))
+                    viewModel.onEvent(MainEvent.ChangeUserMode(userMode))
                 }
             )
         }
@@ -131,7 +130,7 @@ fun AppNavigation(
                     .fillMaxSize()
                     .padding(paddingValues),
                 navigateToNext = {
-                    viewModel.onEvent(ScheduleEvent.CreateConfiguration)
+                    viewModel.onEvent(MainEvent.CreateConfiguration)
 
                     navController.navigate(ScreenRoute.ScheduleScreen.route) {
                         popUpTo(0)
@@ -144,7 +143,7 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.ScheduleScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(800))
             },
             exitTransition = {
                 fadeOut(animationSpec = tween(400))
@@ -154,8 +153,7 @@ fun AppNavigation(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                isUpperWeek = state.isUpperWeek,
-                scheduleList = scheduleList
+                isUpperWeek = state.isUpperWeek
             )
         }
     }

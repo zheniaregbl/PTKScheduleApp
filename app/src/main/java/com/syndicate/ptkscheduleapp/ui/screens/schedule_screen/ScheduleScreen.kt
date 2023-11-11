@@ -1,11 +1,14 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,115 +17,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
-import com.syndicate.ptkscheduleapp.info_functions.filterSchedule
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
-import com.syndicate.ptkscheduleapp.ui.theme.GrayText
-import java.util.Calendar
+import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
+import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
+import java.time.LocalDate
 
 @Composable
 fun ScheduleScreen(
     modifier: Modifier = Modifier,
-    isUpperWeek: Boolean = true,
-    scheduleList: List<List<LessonItem>>? = listOf(
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        ),
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        ),
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        ),
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        ),
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        ),
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        )
-    )
+    isUpperWeek: Boolean = true
 ) {
-    val calendar = Calendar.getInstance()
-    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+    val viewModel = hiltViewModel<ScheduleViewModel>()
+    val scheduleList = viewModel.currentSchedule.observeAsState()
+    val currentSchedule = if (scheduleList.value.isNullOrEmpty()) {
+        listOf(LessonItem(), LessonItem(), LessonItem(), LessonItem())
+    } else scheduleList.value!!
 
     val topDatePanelState = remember {
         mutableStateOf(PanelState.WeekPanel)
     }
-
-    val list = scheduleList
-        ?: listOf(
-            listOf(
-                LessonItem(),
-                LessonItem(
-                    subgroupNumber = 1
-                ),
-                LessonItem(
-                    subgroupNumber = 2
-                ),
-                LessonItem(
-                    subgroupNumber = 3
-                ),
-                LessonItem(
-                    subgroupNumber = 4
-                ),
-                LessonItem(),
-            ),
-            listOf(
-                LessonItem(), LessonItem(), LessonItem(), LessonItem()
-            ),
-            listOf(
-                LessonItem(), LessonItem(), LessonItem(), LessonItem()
-            ),
-            listOf(
-                LessonItem(), LessonItem(), LessonItem(), LessonItem()
-            ),
-            listOf(
-                LessonItem(), LessonItem(), LessonItem(), LessonItem()
-            ),
-            listOf(
-                LessonItem(), LessonItem(), LessonItem(), LessonItem()
-            )
-        )
-
-    val currentSchedule = when (dayOfWeek) {
-        Calendar.MONDAY -> filterSchedule(list[0], isUpperWeek)
-        Calendar.TUESDAY -> filterSchedule(list[1], isUpperWeek)
-        Calendar.WEDNESDAY -> filterSchedule(list[2], isUpperWeek)
-        Calendar.THURSDAY -> filterSchedule(list[3], isUpperWeek)
-        Calendar.FRIDAY -> filterSchedule(list[4], isUpperWeek)
-        Calendar.SATURDAY -> filterSchedule(list[5], isUpperWeek)
-        else -> filterSchedule(list[0], isUpperWeek)
+    val selectedDateState = remember {
+        mutableStateOf(LocalDate.now())
     }
 
     var listSeveralLessons = ArrayList<LessonItem>()
     var prevLessonNumber = -1
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek))
+    }
 
     Box(
         modifier = Modifier
@@ -137,56 +78,36 @@ fun ScheduleScreen(
             }
             .composed { modifier }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    horizontal = 16.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        AnimatedContent(
+            targetState = currentSchedule,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
+            },
+            label = ""
+        ) { currentSchedule ->
 
-            item {
-                Spacer(
-                    modifier = Modifier
-                        .height(140.dp)
-                )
-            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        horizontal = 16.dp
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            itemsIndexed(currentSchedule) { index, item ->
+                item {
+                    Spacer(
+                        modifier = Modifier
+                            .height(140.dp)
+                    )
+                }
 
-                if (index != 0) prevLessonNumber = currentSchedule[index - 1].pairNumber
+                itemsIndexed(currentSchedule) { index, item ->
 
-                if (item.lessonTitle != "") {
-                    if (item.subgroupNumber == 0) {
-                        LessonCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .shadow(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(10.dp),
-                                    clip = false,
-                                    ambientColor = Color.Black.copy(alpha = 0.15f)
-                                )
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    color = FirstThemeBackground
-                                )
-                                .clickable { },
-                            lessonItem = item
-                        )
+                    if (index != 0) prevLessonNumber = currentSchedule[index - 1].pairNumber
 
-                        if (index != currentSchedule.lastIndex)
-                            Spacer(
-                                modifier = Modifier
-                                    .height(20.dp)
-                            )
-                    } else {
-                        listSeveralLessons.add(item)
-
-                        if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
-                            || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
-                            || index != 0 && prevLessonNumber == item.pairNumber) {
+                    if (item.lessonTitle != "") {
+                        if (item.subgroupNumber == 0) {
                             LessonCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -199,8 +120,9 @@ fun ScheduleScreen(
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(
                                         color = FirstThemeBackground
-                                    ),
-                                lessonList = listSeveralLessons
+                                    )
+                                    .clickable { },
+                                lessonItem = item
                             )
 
                             if (index != currentSchedule.lastIndex)
@@ -208,25 +130,63 @@ fun ScheduleScreen(
                                     modifier = Modifier
                                         .height(20.dp)
                                 )
+                        } else {
+                            listSeveralLessons.add(item)
 
-                            listSeveralLessons = ArrayList()
+                            if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
+                                || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
+                                || index != 0 && prevLessonNumber == item.pairNumber) {
+                                LessonCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .shadow(
+                                            elevation = 4.dp,
+                                            shape = RoundedCornerShape(10.dp),
+                                            clip = false,
+                                            ambientColor = Color.Black.copy(alpha = 0.15f)
+                                        )
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(
+                                            color = FirstThemeBackground
+                                        ),
+                                    lessonList = listSeveralLessons
+                                )
+
+                                if (index != currentSchedule.lastIndex)
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+
+                                listSeveralLessons = ArrayList()
+                            }
                         }
                     }
                 }
-            }
 
-            item {
-                Spacer(
-                    modifier = Modifier
-                        .height(20.dp)
-                )
+                item {
+                    Spacer(
+                        modifier = Modifier
+                            .height(20.dp)
+                    )
+                }
             }
         }
 
         TopDatePanel(
             modifier = Modifier
                 .fillMaxSize(),
-            panelState = topDatePanelState
+            panelState = topDatePanelState,
+            selectedDateState = selectedDateState,
+            weekType = isUpperWeek,
+            changeSchedule = { dayOfWeek, typeWeek ->
+                viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek))
+            },
+            hideCalendar = {
+                if (topDatePanelState.value == PanelState.CalendarPanel) {
+                    topDatePanelState.value = PanelState.WeekPanel
+                }
+            }
         )
     }
 }

@@ -65,37 +65,43 @@ import kotlin.math.abs
 fun TopDatePanel(
     modifier: Modifier = Modifier
         .fillMaxSize(),
-    panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel)
+    panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
+    selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
+    weekType: Boolean = true,
+    changeSchedule: (DayOfWeek, Boolean) -> Unit = { _: DayOfWeek, _: Boolean -> },
+    hideCalendar: () -> Unit = { }
 ) {
-    val dateState = remember {
-        mutableStateOf(LocalDate.now())
-    }
     val weeks = getWeeksFromStartDate(
         LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
         78
     )
+    val initWeekNumber = getCurrentWeek(weeks, LocalDate.now())
     val months = getMonthsFromWeeks(weeks)
+
     val pagerWeekStateSaved = remember {
-        mutableIntStateOf(getCurrentWeek(weeks, LocalDate.now()))
+        mutableIntStateOf(initWeekNumber)
     }
     val pagerMonthStateSaved = remember {
         mutableIntStateOf(getCurrentMonth(months, LocalDate.now()))
     }
+
     var direction by remember {
         mutableStateOf(SwipeDirection.UP)
     }
+
     val colorShadow by animateColorAsState(
         targetValue = if (panelState.value == PanelState.CalendarPanel)
             Color.Black.copy(alpha = 0.35f) else Color.Transparent,
         animationSpec = tween(300, easing = LinearEasing),
         label = ""
     )
+
     val monthValue = remember {
         mutableStateOf(LocalDate.now().month)
     }
     val monthText = remember {
         mutableStateOf(
-            when (dateState.value.month) {
+            when (selectedDateState.value.month) {
                 Month.JANUARY -> "Январь"
                 Month.FEBRUARY -> "Февраль"
                 Month.MARCH -> "Март"
@@ -112,8 +118,9 @@ fun TopDatePanel(
             }
         )
     }
+
     val yearText = remember {
-        mutableIntStateOf(dateState.value.year)
+        mutableIntStateOf(selectedDateState.value.year)
     }
 
     Box(
@@ -279,12 +286,14 @@ fun TopDatePanel(
                                 top = 6.dp,
                                 bottom = 12.dp
                             ),
-                        selectedDate = dateState,
+                        selectedDate = selectedDateState,
+                        weekType = weekType,
                         weeks = weeks,
                         monthValue = monthValue,
                         pagerWeekStateSaved = pagerWeekStateSaved,
                         monthText = monthText,
-                        yearText = yearText
+                        yearText = yearText,
+                        changeSchedule = changeSchedule
                     )
                 }
 
@@ -301,12 +310,16 @@ fun TopDatePanel(
                                 .padding(
                                     bottom = 12.dp
                                 ),
-                            selectedDate = dateState,
+                            selectedDate = selectedDateState,
+                            weekType = weekType,
+                            weekList = weeks,
                             months = months,
                             monthValue = monthValue,
                             pagerMonthStateSaved = pagerMonthStateSaved,
                             monthText = monthText,
-                            yearText = yearText
+                            yearText = yearText,
+                            changeSchedule = changeSchedule,
+                            hideCalendar = hideCalendar
                         )
                     }
                 }
@@ -320,11 +333,13 @@ fun TopDatePanel(
 fun WeekPanel(
     modifier: Modifier = Modifier,
     selectedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
+    weekType: Boolean,
     weeks: List<List<LocalDate>>,
     monthValue: MutableState<Month>,
     pagerWeekStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
-    yearText: MutableState<Int>
+    yearText: MutableState<Int>,
+    changeSchedule: (DayOfWeek, Boolean) -> Unit
 ) {
     pagerWeekStateSaved.value = syncPanels(
         weeks,
@@ -392,7 +407,17 @@ fun WeekPanel(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .clickable { selectedDate.value = date }
+                            .clickable {
+                                changeSchedule(
+                                    date.dayOfWeek,
+                                    getCurrentTypeWeek(
+                                        weekType,
+                                        getCurrentWeek(weeks, LocalDate.now()),
+                                        getCurrentWeek(weeks, date)
+                                    )
+                                )
+                                selectedDate.value = date
+                            }
                             .border(
                                 width = 1.5.dp,
                                 color = if (date == selectedDate.value) GrayText.copy(alpha = 0.6f) else Color.Transparent,
@@ -419,11 +444,15 @@ fun WeekPanel(
 fun Calendar(
     modifier: Modifier = Modifier,
     selectedDate: MutableState<LocalDate>,
+    weekType: Boolean,
+    weekList: List<List<LocalDate>>,
     months: List<List<LocalDate>>,
     monthValue: MutableState<Month>,
     pagerMonthStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
-    yearText: MutableState<Int>
+    yearText: MutableState<Int>,
+    changeSchedule: (DayOfWeek, Boolean) -> Unit,
+    hideCalendar: () -> Unit
 ) {
     pagerMonthStateSaved.value = syncPanels(
         months,
@@ -491,8 +520,12 @@ fun Calendar(
                     WeekRow(
                         modifier = Modifier
                             .fillMaxWidth(),
+                        weekType = weekType,
+                        weeks = weekList,
                         week = week,
-                        selectedDate = selectedDate
+                        selectedDate = selectedDate,
+                        changeSchedule = changeSchedule,
+                        hideCalendar = hideCalendar
                     )
                 }
             }
@@ -503,8 +536,12 @@ fun Calendar(
 @Composable
 fun WeekRow(
     modifier: Modifier = Modifier,
+    weekType: Boolean,
+    weeks: List<List<LocalDate>>,
     week: List<LocalDate>,
-    selectedDate: MutableState<LocalDate>
+    selectedDate: MutableState<LocalDate>,
+    changeSchedule: (DayOfWeek, Boolean) -> Unit,
+    hideCalendar: () -> Unit
 ) {
     var currentDayOfWeek = DayOfWeek.SUNDAY
     var currentIndex = 0
@@ -520,7 +557,11 @@ fun WeekRow(
                 DayItem(
                     selectedDate = selectedDate,
                     value = week[currentIndex],
-                    isEmpty = false
+                    isEmpty = false,
+                    weekType = weekType,
+                    weeks = weeks,
+                    changeSchedule = changeSchedule,
+                    hideCalendar = hideCalendar
                 )
 
                 if (currentIndex != week.size - 1)
@@ -530,7 +571,11 @@ fun WeekRow(
                 DayItem(
                     selectedDate = selectedDate,
                     value = week[currentIndex],
-                    isEmpty = true
+                    isEmpty = true,
+                    weekType = weekType,
+                    weeks = weeks,
+                    changeSchedule = changeSchedule,
+                    hideCalendar = hideCalendar
                 )
             }
 
@@ -544,7 +589,11 @@ fun WeekRow(
 fun DayItem(
     selectedDate: MutableState<LocalDate>,
     value: LocalDate,
-    isEmpty: Boolean
+    isEmpty: Boolean,
+    weekType: Boolean,
+    weeks: List<List<LocalDate>>,
+    changeSchedule: (DayOfWeek, Boolean) -> Unit,
+    hideCalendar: () -> Unit
 ) {
 
     if (!isEmpty)
@@ -553,7 +602,18 @@ fun DayItem(
                 .size(36.dp)
                 .clip(CircleShape)
                 .clickable {
+                    changeSchedule(
+                        value.dayOfWeek,
+                        getCurrentTypeWeek(
+                            weekType,
+                            getCurrentWeek(weeks, LocalDate.now()),
+                            getCurrentWeek(weeks, value)
+                        )
+                    )
+
                     selectedDate.value = value
+
+                    hideCalendar()
                 }
                 .border(
                     width = 1.5.dp,
@@ -608,6 +668,12 @@ private fun getWeeksFromStartDate(
 
     return weeks
 }
+
+private fun getCurrentTypeWeek(
+    typeWeekNow: Boolean,
+    prevPage: Int,
+    currentPage: Int
+) = if (prevPage % 2 == currentPage % 2) typeWeekNow else !typeWeekNow
 
 private fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
     for (i in weeks.indices) {

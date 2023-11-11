@@ -14,7 +14,7 @@ import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.navigation.AppNavGraph
 import com.syndicate.ptkscheduleapp.ui.theme.PTKScheduleAppTheme
 import com.syndicate.ptkscheduleapp.ui.utils.LockScreenOrientation
-import com.syndicate.ptkscheduleapp.view_model.ScheduleViewModel
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,9 +30,8 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val viewModel = hiltViewModel<ScheduleViewModel>()
+            val viewModel = hiltViewModel<MainViewModel>()
             val state by viewModel.state.collectAsState()
-            val scheduleList = viewModel.scheduleList.observeAsState()
 
             PTKScheduleAppTheme {
 
@@ -42,7 +41,6 @@ class MainActivity : ComponentActivity() {
 
                 AppNavGraph(
                     state = state,
-                    scheduleList = scheduleList.value,
                     viewModel = viewModel
                 )
             }

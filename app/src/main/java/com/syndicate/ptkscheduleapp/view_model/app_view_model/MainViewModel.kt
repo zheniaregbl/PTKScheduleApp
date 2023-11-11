@@ -1,7 +1,6 @@
-package com.syndicate.ptkscheduleapp.view_model
+package com.syndicate.ptkscheduleapp.view_model.app_view_model
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ScheduleViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val repository: ScheduleRepository,
     private val sharedPreferences: SharedPreferences
 ): ViewModel() {
@@ -33,19 +32,19 @@ class ScheduleViewModel @Inject constructor(
         initLiveData()
     }
 
-    fun onEvent(event: ScheduleEvent) {
+    fun onEvent(event: MainEvent) {
         when (event) {
 
-            ScheduleEvent.GetScheduleOnWeek -> {
+            MainEvent.GetScheduleOnWeek -> {
                 initState()
                 initLiveData()
             }
 
-            is ScheduleEvent.ChangeUserMode -> {
+            is MainEvent.ChangeUserMode -> {
                 changeUserMode(event.newUserMode)
             }
 
-            ScheduleEvent.CreateConfiguration -> {
+            MainEvent.CreateConfiguration -> {
                 createConfiguration()
             }
         }
@@ -56,6 +55,8 @@ class ScheduleViewModel @Inject constructor(
             val scheduleJson = repository.getScheduleOnWeek("1991")
             val schedule = getScheduleFromJson(scheduleJson)
             _scheduleList.postValue(schedule)
+
+            sharedPreferences.edit().putString("schedule", scheduleJson.toString()).apply()
         }
     }
 
@@ -63,8 +64,12 @@ class ScheduleViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
 
+            val isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+
+            sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
+
             state.update { it.copy(
-                isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper"),
+                isUpperWeek = isUpperWeek,
                 isFirstStart = isFirstStart
             ) }
         }
