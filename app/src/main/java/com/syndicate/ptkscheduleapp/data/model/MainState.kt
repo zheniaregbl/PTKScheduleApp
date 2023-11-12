@@ -6,5 +6,6 @@ data class MainState(
     val colorThemeMode: ThemeMode = ThemeMode.FIRST,
     val isUpperWeek: Boolean = true,
     val userMode: UserMode = UserMode.Student,
+    val group: String = "1991",
     val isFirstStart: Boolean = true
 )

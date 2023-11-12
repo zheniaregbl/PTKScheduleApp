@@ -1,7 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith

@@ -31,12 +31,12 @@ import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
 fun GroupSelectionScreen(
     modifier: Modifier = Modifier,
     navigateToNext: () -> Unit = { },
+    changeUserGroup: (String) -> Unit = { },
     userMode: UserMode = UserMode.Student
 ) {
     val valuesPickerState = rememberPickerState()
     val listGroup = if (userMode == UserMode.Student) listOf(
-        "1991", "1992", "1993", "1994", "1995",
-        "1996", "1997", "1998", "1999", "1990"
+        "1991", "1992", "2996", "0901", "0902", "0951"
     ) else listOf(
         "Цымбалюк Л.Н.", "Кручинина О.А.", "Сазонова Н.В.", "Дубогрей А.Е."
     )
@@ -104,7 +104,10 @@ fun GroupSelectionScreen(
                             horizontal = 82.dp,
                             vertical = 18.dp
                         ),
-                    onClick = navigateToNext,
+                    onClick = {
+                        changeUserGroup(valuesPickerState.selectedItem)
+                        navigateToNext()
+                    },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
                     textColor = Color.Black

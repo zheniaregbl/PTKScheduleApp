@@ -4,7 +4,11 @@ import com.syndicate.ptkscheduleapp.data.model.UserMode
 
 sealed interface MainEvent {
 
-    data object GetScheduleOnWeek: MainEvent
+    data object ReceiveScheduleFromServer: MainEvent
+
+    data class ChangeUserGroup(
+        val newUserGroup: String
+    ): MainEvent
 
     data object CreateConfiguration: MainEvent
 
