@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -35,8 +36,10 @@ import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
+import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 
 @Composable
@@ -61,6 +64,7 @@ fun ScheduleScreen(
     var prevLessonNumber = -1
 
     LaunchedEffect(Unit) {
+        delay(300)
         viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek))
     }
 
@@ -113,14 +117,19 @@ fun ScheduleScreen(
                                     .shadow(
                                         elevation = 4.dp,
                                         shape = RoundedCornerShape(10.dp),
-                                        clip = false,
-                                        ambientColor = Color.Black.copy(alpha = 0.15f)
+                                        clip = true,
+                                        spotColor = Color.Black.copy(alpha = 0.3f),
+                                        ambientColor = Color.Black.copy(alpha = 0.3f)
                                     )
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(
                                         color = FirstThemeBackground
                                     )
-                                    .clickable { },
+                                    .border(
+                                        width = 2.dp,
+                                        color = ThirdThemeBackground,
+                                        shape = RoundedCornerShape(10.dp)
+                                    ),
                                 lessonItem = item
                             )
 
@@ -141,12 +150,18 @@ fun ScheduleScreen(
                                         .shadow(
                                             elevation = 4.dp,
                                             shape = RoundedCornerShape(10.dp),
-                                            clip = false,
-                                            ambientColor = Color.Black.copy(alpha = 0.15f)
+                                            clip = true,
+                                            spotColor = Color.Black.copy(alpha = 0.3f),
+                                            ambientColor = Color.Black.copy(alpha = 0.3f)
                                         )
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(
                                             color = FirstThemeBackground
+                                        )
+                                        .border(
+                                            width = 2.dp,
+                                            color = ThirdThemeBackground,
+                                            shape = RoundedCornerShape(10.dp)
                                         ),
                                     lessonList = listSeveralLessons
                                 )

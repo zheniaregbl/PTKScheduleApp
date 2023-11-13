@@ -1,17 +1,29 @@
 package com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.GroupPicker
@@ -34,6 +51,18 @@ fun GroupSelectionScreen(
     changeUserGroup: (String) -> Unit = { },
     userMode: UserMode = UserMode.Student
 ) {
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(resId = R.raw.loading_lottie2)
+    )
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+    val progress by animateLottieCompositionAsState(
+        composition =  composition,
+        isPlaying = isLoading,
+        speed = 1f
+    )
+
     val valuesPickerState = rememberPickerState()
     val listGroup = if (userMode == UserMode.Student) listOf(
         "1991", "1992", "2996", "0901", "0902", "0951"
@@ -45,6 +74,7 @@ fun GroupSelectionScreen(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -104,13 +134,36 @@ fun GroupSelectionScreen(
                             horizontal = 82.dp,
                             vertical = 18.dp
                         ),
+                    enable = !isLoading,
                     onClick = {
+                        isLoading = !isLoading
                         changeUserGroup(valuesPickerState.selectedItem)
                         navigateToNext()
                     },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
                     textColor = Color.Black
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = isLoading,
+            enter = fadeIn()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.Black.copy(alpha = 0.55f)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                LottieAnimation(
+                    modifier = Modifier
+                        .size(100.dp),
+                    composition = composition,
+                    progress = { progress }
                 )
             }
         }

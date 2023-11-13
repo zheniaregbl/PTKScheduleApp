@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -75,7 +77,11 @@ class MainViewModel @Inject constructor(
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
 
             if (networkState) {
-                val isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+                var isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+
+                if (LocalDate.now().dayOfWeek == DayOfWeek.SUNDAY)
+                    isUpperWeek = !isUpperWeek
+
                 sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
                 state.update { it.copy(
                     isUpperWeek = isUpperWeek,

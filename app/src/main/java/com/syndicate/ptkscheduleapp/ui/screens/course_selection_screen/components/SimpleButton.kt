@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SimpleButton(
     modifier: Modifier = Modifier,
+    enable: Boolean = true,
     onClick: () -> Unit = { },
     text: String = "Далее",
     fontSize: TextUnit = 20.sp,
@@ -34,7 +35,7 @@ fun SimpleButton(
                 interactionSource = remember {
                     MutableInteractionSource()
                 }
-            ) { onClick() }
+            ) { if (enable) onClick() }
             .composed { modifier },
         contentAlignment = Alignment.Center
     ) {
