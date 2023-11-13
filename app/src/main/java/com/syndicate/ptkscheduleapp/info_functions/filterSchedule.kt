@@ -8,9 +8,7 @@ fun filterSchedule(
 ): List<LessonItem> {
 
     val schedule = if (inputSchedule.isNullOrEmpty()) {
-        listOf(
-            LessonItem(), LessonItem(), LessonItem(), LessonItem()
-        )
+        return emptyList()
     } else {
         inputSchedule
     }
