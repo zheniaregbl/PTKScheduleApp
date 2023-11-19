@@ -67,7 +67,7 @@ class ScheduleViewModel @Inject constructor(
             DayOfWeek.THURSDAY -> _scheduleList.value?.get(3)
             DayOfWeek.FRIDAY -> _scheduleList.value?.get(4)
             DayOfWeek.SATURDAY -> _scheduleList.value?.get(5)
-            DayOfWeek.SUNDAY -> _scheduleList.value?.get(0)
+            DayOfWeek.SUNDAY -> emptyList()
         }
 
         _currentSchedule.postValue(

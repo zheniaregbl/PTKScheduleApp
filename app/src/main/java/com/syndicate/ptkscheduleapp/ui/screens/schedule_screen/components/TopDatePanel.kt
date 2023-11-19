@@ -1,6 +1,7 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -260,7 +261,22 @@ fun TopDatePanel(
                         ),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    listOf("ВС", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ").forEach {
+                    /*listOf("ВС", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ").forEach {
+                        Box(
+                            modifier = Modifier
+                                .width(36.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = GrayThirdTheme
+                            )
+                        }
+                    }*/
+                    listOf("ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС").forEach {
                         Box(
                             modifier = Modifier
                                 .width(36.dp),
@@ -543,7 +559,7 @@ fun WeekRow(
     changeSchedule: (DayOfWeek, Boolean) -> Unit,
     hideCalendar: () -> Unit
 ) {
-    var currentDayOfWeek = DayOfWeek.SUNDAY
+    var currentDayOfWeek = DayOfWeek.MONDAY //DayOfWeek.SUNDAY
     var currentIndex = 0
     var counterDays = 7
 
@@ -656,7 +672,11 @@ private fun getWeeksFromStartDate(
     val weeks = mutableListOf<List<LocalDate>>()
     var currentStartOfWeek = startDate
 
-    while (currentStartOfWeek.dayOfWeek != DayOfWeek.SUNDAY) {
+    /*while (currentStartOfWeek.dayOfWeek != DayOfWeek.SUNDAY) {
+        currentStartOfWeek = currentStartOfWeek.minusDays(1)
+    }*/
+
+    while (currentStartOfWeek.dayOfWeek != DayOfWeek.MONDAY) {
         currentStartOfWeek = currentStartOfWeek.minusDays(1)
     }
 
@@ -678,19 +698,29 @@ private fun getCurrentTypeWeek(
 private fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
     for (i in weeks.indices) {
 
-        if (weeks[i][3].month == currentDate.month) {
+        for (j in weeks[i].indices) {
+
+            if (weeks[i][j].month == currentDate.month) {
+                weeks[i].forEach { day ->
+                    if (day.dayOfMonth == currentDate.dayOfMonth)
+                        return i
+                }
+            }
+        }
+        /*if (weeks[i][3].month == currentDate.month) {
             weeks[i].forEach { day ->
                 if (day.dayOfMonth == currentDate.dayOfMonth)
                     return i
             }
-        }
+        }*/
     }
 
     return 0
 }
 
 private fun getWeeksFromMonth(month: List<LocalDate>): List<List<LocalDate>> {
-    var currentDayOfWeek = DayOfWeek.SUNDAY
+    // var currentDayOfWeek = DayOfWeek.SUNDAY
+    var currentDayOfWeek = DayOfWeek.MONDAY
     var arrayDaysOfWeek = ArrayList<LocalDate>()
     val arrayWeeksOfMonth = ArrayList<List<LocalDate>>()
     var currentIndex = 0
@@ -705,7 +735,7 @@ private fun getWeeksFromMonth(month: List<LocalDate>): List<List<LocalDate>> {
             monthSize--
         }
 
-        if (currentDayOfWeek == DayOfWeek.SATURDAY) {
+        if (currentDayOfWeek == DayOfWeek.SUNDAY /*DayOfWeek.SATURDAY*/) {
 
             arrayWeeksOfMonth.add(arrayDaysOfWeek)
             arrayDaysOfWeek = ArrayList()

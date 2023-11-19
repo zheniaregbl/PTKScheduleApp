@@ -29,13 +29,14 @@ fun filterSchedule(
         }
     }
 
-    for (i in 0..<resultList.size) {
-        val pair = resultList[i]
+    if (isUpper) {
 
-        if (isUpper) {
+        for (i in 0..<resultList.size) {
+            val pair = resultList[i]
+
             if (pair.pairNumber in upperNumbers) {
                 upperPair.forEach {
-                    if (pair.pairNumber == it.pairNumber)
+                    if (pair.pairNumber == it.pairNumber && pair.subgroupNumber == it.subgroupNumber)
                         resultList[i] = it
                 }
             }

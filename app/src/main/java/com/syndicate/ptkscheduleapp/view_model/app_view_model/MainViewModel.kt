@@ -79,8 +79,8 @@ class MainViewModel @Inject constructor(
             if (networkState) {
                 var isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
 
-                if (LocalDate.now().dayOfWeek == DayOfWeek.SUNDAY)
-                    isUpperWeek = !isUpperWeek
+                /*if (LocalDate.now().dayOfWeek == DayOfWeek.SUNDAY)
+                    isUpperWeek = !isUpperWeek*/
 
                 sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
                 state.update { it.copy(
