@@ -28,7 +28,7 @@ import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
 @Composable
 fun CourseSelectionScreen(
     modifier: Modifier = Modifier,
-    navigateToNext: () -> Unit = { }
+    navigateToNext: (Int) -> Unit = { }
 ) {
     val radioOptions = listOf("1 курс", "2 курс", "3 курс", "4 курс")
     val radioState = remember {
@@ -87,7 +87,9 @@ fun CourseSelectionScreen(
                             horizontal = 82.dp,
                             vertical = 18.dp
                         ),
-                    onClick = navigateToNext,
+                    onClick = {
+                        navigateToNext(radioState.intValue)
+                    },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
                     textColor = Color.Black

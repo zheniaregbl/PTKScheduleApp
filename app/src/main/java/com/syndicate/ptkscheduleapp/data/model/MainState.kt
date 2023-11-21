@@ -7,5 +7,6 @@ data class MainState(
     val isUpperWeek: Boolean = true,
     val userMode: UserMode = UserMode.Student,
     val group: String = "1991",
+    val course: Int = 3,
     val isFirstStart: Boolean = true
 )

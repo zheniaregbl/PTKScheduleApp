@@ -115,7 +115,9 @@ fun AppNavigation(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                navigateToNext = {
+                navigateToNext = { userCourse ->
+                    viewModel.onEvent(MainEvent.ChangeUserCourse(userCourse))
+
                     navController.navigate(ScreenRoute.GroupSelectionScreen.route) {
                         popUpTo(0)
                     }

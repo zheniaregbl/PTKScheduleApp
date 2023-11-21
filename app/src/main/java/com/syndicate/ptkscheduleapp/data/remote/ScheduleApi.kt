@@ -16,4 +16,7 @@ interface ScheduleApi {
 
     @GET("getcurrentweek")
     suspend fun getCurrentWeek(): Response<JsonObject>
+
+    @GET("getgroup")
+    suspend fun getListGroup(): Response<JsonObject>
 }

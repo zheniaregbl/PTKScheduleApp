@@ -2,10 +2,7 @@ package com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -43,6 +43,9 @@ import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.component
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.GroupPicker
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.rememberPickerState
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
+import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionEvent
+import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun GroupSelectionScreen(
@@ -51,6 +54,9 @@ fun GroupSelectionScreen(
     changeUserGroup: (String) -> Unit = { },
     userMode: UserMode = UserMode.Student
 ) {
+    val viewModel = hiltViewModel<GroupSelectionViewModel>()
+    val listGroup = viewModel.listGroup.observeAsState()
+
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(resId = R.raw.loading_lottie2)
     )
@@ -64,11 +70,16 @@ fun GroupSelectionScreen(
     )
 
     val valuesPickerState = rememberPickerState()
-    val listGroup = if (userMode == UserMode.Student) listOf(
-        "1991", "1992", "2996", "0901", "0902", "0951"
-    ) else listOf(
+    val groups = if (userMode == UserMode.Student)
+        listGroup.value
+    else listOf(
         "Цымбалюк Л.Н.", "Кручинина О.А.", "Сазонова Н.В.", "Дубогрей А.Е."
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(GroupSelectionEvent.FillListGroup)
+        delay(200)
+    }
 
     Box(
         modifier = modifier,
@@ -101,19 +112,24 @@ fun GroupSelectionScreen(
             }
 
             item {
-                GroupPicker(
-                    state = valuesPickerState,
-                    items = listGroup,
-                    visibleItemsCount = 5,
-                    modifier = Modifier.width(
-                        if (userMode == UserMode.Student) 130.dp
-                        else 250.dp
-                    ),
-                    textModifier = Modifier.padding(8.dp),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    fontSize = if (userMode == UserMode.Student) 40.sp
-                    else 26.sp
-                )
+                AnimatedContent(
+                    targetState = groups,
+                    label = ""
+                ) { groups ->
+                    GroupPicker(
+                        state = valuesPickerState,
+                        items = groups,
+                        visibleItemsCount = 5,
+                        modifier = Modifier.width(
+                            if (userMode == UserMode.Student) 130.dp
+                            else 250.dp
+                        ),
+                        textModifier = Modifier.padding(8.dp),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        fontSize = if (userMode == UserMode.Student) 40.sp
+                        else 26.sp
+                    )
+                }
             }
 
             item {

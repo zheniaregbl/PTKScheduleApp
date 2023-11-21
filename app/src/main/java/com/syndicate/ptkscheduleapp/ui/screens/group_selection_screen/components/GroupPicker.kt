@@ -39,10 +39,10 @@ import kotlinx.coroutines.flow.map
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GroupPicker(
-    items: List<String>,
+    items: List<String>?,
     state: PickerState = rememberPickerState(),
     modifier: Modifier = Modifier,
-    startIndex: Int = 34,
+    startIndex: Int = 0,
     visibleItemsCount: Int = 5,
     textModifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
@@ -50,12 +50,16 @@ fun GroupPicker(
     dividerColor: Color = LocalContentColor.current,
 ) {
 
+    val itemsPicker = if (items.isNullOrEmpty()) listOf(
+        "-", "-", "-", "-", "-", "-", "-"
+    ) else items
+
     val visibleItemsMiddle = visibleItemsCount / 2
     val listScrollCount = Integer.MAX_VALUE
     val listScrollMiddle = listScrollCount / 2
-    val listStartIndex = listScrollMiddle - listScrollMiddle % items.size - visibleItemsMiddle + startIndex
+    val listStartIndex = listScrollMiddle - listScrollMiddle % itemsPicker.size - visibleItemsMiddle + startIndex
 
-    fun getItem(index: Int) = items[index % items.size]
+    fun getItem(index: Int) = itemsPicker[index % itemsPicker.size]
 
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = listStartIndex)
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)

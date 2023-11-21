@@ -6,6 +6,10 @@ sealed interface MainEvent {
 
     data object ReceiveScheduleFromServer: MainEvent
 
+    data class ChangeUserCourse(
+        val newUserCourse: Int
+    ): MainEvent
+
     data class ChangeUserGroup(
         val newUserGroup: String
     ): MainEvent

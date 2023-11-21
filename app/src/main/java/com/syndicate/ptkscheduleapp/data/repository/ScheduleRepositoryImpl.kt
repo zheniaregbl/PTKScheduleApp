@@ -26,4 +26,12 @@ class ScheduleRepositoryImpl @Inject constructor(
 
         if (response.isSuccessful) JSONObject(response.body().toString()) else JSONObject()
     }
+
+    override suspend fun getListGroupByCourse(course: String): JSONArray = withContext(Dispatchers.IO) {
+        val response = scheduleApi.getListGroup()
+
+        if (response.isSuccessful)
+            JSONObject(response.body().toString()).getJSONArray(course)
+        else JSONArray()
+    }
 }

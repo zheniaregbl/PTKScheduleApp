@@ -3,11 +3,15 @@ package com.syndicate.ptkscheduleapp.view_model.app_view_model
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
+import com.syndicate.ptkscheduleapp.info_functions.getListGroup
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -40,6 +44,14 @@ class MainViewModel @Inject constructor(
                 receiveSchedule(context.value)
             }
 
+            is MainEvent.ChangeUserCourse -> {
+                state.update { it.copy(
+                    course = event.newUserCourse
+                ) }
+
+                sharedPreferences.edit().putInt("user_course", event.newUserCourse).apply()
+            }
+
             is MainEvent.ChangeUserGroup -> {
                 sharedPreferences.edit().putString("user_group", event.newUserGroup).apply()
 
@@ -63,7 +75,8 @@ class MainViewModel @Inject constructor(
         if (isNetworkAvailable(context)) {
             viewModelScope.launch(Dispatchers.IO) {
 
-                val scheduleJson = repository.getScheduleOnWeek(state.value.group)
+                val userGroup = sharedPreferences.getString("user_group", "1991")
+                val scheduleJson = repository.getScheduleOnWeek(userGroup!!)
                 sharedPreferences.edit().putString("schedule", scheduleJson.toString()).apply()
             }
         }
@@ -77,10 +90,7 @@ class MainViewModel @Inject constructor(
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
 
             if (networkState) {
-                var isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
-
-                /*if (LocalDate.now().dayOfWeek == DayOfWeek.SUNDAY)
-                    isUpperWeek = !isUpperWeek*/
+                val isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
 
                 sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
                 state.update { it.copy(
