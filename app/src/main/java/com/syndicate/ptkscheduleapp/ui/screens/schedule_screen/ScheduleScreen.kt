@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import java.time.LocalDate
 @Composable
 fun ScheduleScreen(
     modifier: Modifier = Modifier,
+    panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     isUpperWeek: Boolean = true
 ) {
     val viewModel = hiltViewModel<ScheduleViewModel>()
@@ -55,9 +57,6 @@ fun ScheduleScreen(
         emptyList()
     } else scheduleList.value!!
 
-    val topDatePanelState = remember {
-        mutableStateOf(PanelState.WeekPanel)
-    }
     val selectedDateState = remember {
         mutableStateOf(LocalDate.now())
     }
@@ -78,8 +77,8 @@ fun ScheduleScreen(
                     MutableInteractionSource()
                 }
             ) {
-                if (topDatePanelState.value == PanelState.CalendarPanel)
-                    topDatePanelState.value = PanelState.WeekPanel
+                if (panelState.value == PanelState.CalendarPanel)
+                    panelState.value = PanelState.WeekPanel
             }
             .composed { modifier }
     ) {
@@ -212,15 +211,15 @@ fun ScheduleScreen(
         TopDatePanel(
             modifier = Modifier
                 .fillMaxSize(),
-            panelState = topDatePanelState,
+            panelState = panelState,
             selectedDateState = selectedDateState,
             weekType = isUpperWeek,
             changeSchedule = { dayOfWeek, typeWeek ->
                 viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek))
             },
             hideCalendar = {
-                if (topDatePanelState.value == PanelState.CalendarPanel) {
-                    topDatePanelState.value = PanelState.WeekPanel
+                if (panelState.value == PanelState.CalendarPanel) {
+                    panelState.value = PanelState.WeekPanel
                 }
             }
         )

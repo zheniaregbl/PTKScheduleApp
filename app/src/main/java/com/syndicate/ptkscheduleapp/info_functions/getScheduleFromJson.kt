@@ -43,5 +43,8 @@ fun getScheduleFromJson(
 
     scheduleList.add(tempList)
 
+    if (scheduleList.size < 6)
+        scheduleList.add(emptyList())
+
     return scheduleList
 }

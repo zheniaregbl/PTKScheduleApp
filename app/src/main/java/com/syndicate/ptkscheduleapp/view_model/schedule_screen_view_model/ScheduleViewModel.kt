@@ -45,7 +45,7 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun initState() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Main) {
             val scheduleJson = sharedPreferences.getString("schedule", "")
             val schedule = getScheduleFromJson(JSONArray(scheduleJson))
             _scheduleList.postValue(schedule)

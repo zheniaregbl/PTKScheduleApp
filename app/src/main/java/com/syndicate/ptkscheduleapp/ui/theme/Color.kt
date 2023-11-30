@@ -18,3 +18,7 @@ val ShimmerColorShades = listOf(
     Color.LightGray.copy(0.2f),
     Color.LightGray.copy(0.9f)
 )
+
+// Colors for BottomMenu
+val ActiveNavItemColor = Color(0xFF4A4A4A)
+val InactiveNavItemColor = Color(0xFFECECEC)

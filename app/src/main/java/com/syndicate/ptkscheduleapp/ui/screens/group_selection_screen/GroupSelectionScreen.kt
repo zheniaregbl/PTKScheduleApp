@@ -150,7 +150,7 @@ fun GroupSelectionScreen(
                             horizontal = 82.dp,
                             vertical = 18.dp
                         ),
-                    enable = !isLoading,
+                    enable = !isLoading && !groups.isNullOrEmpty(),
                     onClick = {
                         isLoading = !isLoading
                         changeUserGroup(valuesPickerState.selectedItem)
@@ -175,12 +175,24 @@ fun GroupSelectionScreen(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                LottieAnimation(
+                Box(
                     modifier = Modifier
-                        .size(100.dp),
-                    composition = composition,
-                    progress = { progress }
-                )
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        .padding(
+                            16.dp
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieAnimation(
+                        modifier = Modifier
+                            .size(100.dp),
+                        composition = composition,
+                        progress = { progress }
+                    )
+                }
             }
         }
     }

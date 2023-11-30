@@ -52,7 +52,7 @@ fun SplashScreen(
         composition =  composition,
         isPlaying = isPlaying,
         iterations = 1,
-        speed = 0.45f
+        speed = 0.85f
     )
 
     LaunchedEffect(key1 = progress) {

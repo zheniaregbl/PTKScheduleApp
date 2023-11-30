@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,11 +15,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.syndicate.ptkscheduleapp.data.model.MainState
+import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.CourseSelectionScreen
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.GroupSelectionScreen
 import com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.RoleSelectionScreen
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
+import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.SettingScreen
 import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainEvent
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
@@ -30,6 +33,7 @@ import kotlinx.coroutines.launch
 fun AppNavigation(
     navController: NavHostController,
     state: MainState,
+    panelState: MutableState<PanelState>,
     viewModel: MainViewModel,
     paddingValues: PaddingValues
 ) {
@@ -87,13 +91,9 @@ fun AppNavigation(
                     .padding(paddingValues),
                 navigateToNext = { userMode ->
                     if (userMode == UserMode.Student) {
-                        navController.navigate(ScreenRoute.CourseSelectionScreen.route) {
-                            popUpTo(0)
-                        }
+                        navController.navigate(ScreenRoute.CourseSelectionScreen.route)
                     } else {
-                        navController.navigate(ScreenRoute.GroupSelectionScreen.route) {
-                            popUpTo(0)
-                        }
+                        navController.navigate(ScreenRoute.GroupSelectionScreen.route)
                     }
                 },
                 changeUserMode = { userMode ->
@@ -118,9 +118,7 @@ fun AppNavigation(
                 navigateToNext = { userCourse ->
                     viewModel.onEvent(MainEvent.ChangeUserCourse(userCourse))
 
-                    navController.navigate(ScreenRoute.GroupSelectionScreen.route) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(ScreenRoute.GroupSelectionScreen.route)
                 }
             )
         }
@@ -172,7 +170,24 @@ fun AppNavigation(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
+                panelState = panelState,
                 isUpperWeek = state.isUpperWeek
+            )
+        }
+
+        composable(
+            route = ScreenRoute.SettingScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
+        ) {
+            SettingScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             )
         }
     }

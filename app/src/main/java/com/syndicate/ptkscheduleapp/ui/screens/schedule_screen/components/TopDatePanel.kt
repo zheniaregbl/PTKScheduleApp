@@ -261,21 +261,6 @@ fun TopDatePanel(
                         ),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    /*listOf("ВС", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ").forEach {
-                        Box(
-                            modifier = Modifier
-                                .width(36.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = GrayThirdTheme
-                            )
-                        }
-                    }*/
                     listOf("ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС").forEach {
                         Box(
                             modifier = Modifier
