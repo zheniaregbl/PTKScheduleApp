@@ -131,6 +131,7 @@ fun TopDatePanel(
             )
             .composed { modifier }
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

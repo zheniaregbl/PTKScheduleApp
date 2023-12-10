@@ -1,17 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.bottom_navigation_bar
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Ease
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseInBack
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.EaseOutQuad
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -73,15 +61,6 @@ fun BottomMenu(
         }
     }
 
-    val colorShadow by animateColorAsState(
-        targetValue = if (panelState.value == PanelState.CalendarPanel)
-            Color.Black.copy(alpha = 0.35f) else Color.Transparent,
-        animationSpec = tween(300, easing = LinearOutSlowInEasing),
-        label = ""
-    )
-
-    Log.d("checkTransition", transition.toString())
-
     val items = listOf(
         BottomNavItem(
             name = "schedule",
@@ -112,6 +91,9 @@ fun BottomMenu(
                 .padding(
                     top = 4.dp,
                     bottom = 4.dp
+                )
+                .background(
+                    color = Color.Transparent
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -155,14 +137,6 @@ fun BottomMenu(
                 }
             }
         }
-
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                /*.background(
-                    color = colorShadow
-                )*/
-        )
     }
 }
 

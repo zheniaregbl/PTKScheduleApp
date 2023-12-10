@@ -7,6 +7,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -21,21 +22,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
@@ -61,6 +66,10 @@ fun ScheduleScreen(
         mutableStateOf(LocalDate.now())
     }
 
+    var replacementDialogShow by remember {
+        mutableStateOf(false)
+    }
+
     var listSeveralLessons = ArrayList<LessonItem>()
     var prevLessonNumber = -1
 
@@ -71,14 +80,9 @@ fun ScheduleScreen(
 
     Box(
         modifier = Modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember {
-                    MutableInteractionSource()
-                }
-            ) {
-                if (panelState.value == PanelState.CalendarPanel)
-                    panelState.value = PanelState.WeekPanel
+            .pointerInput(Unit) {
+                detectTapGestures { if (panelState.value == PanelState.CalendarPanel)
+                    panelState.value = PanelState.WeekPanel }
             }
             .composed { modifier }
     ) {
@@ -132,7 +136,10 @@ fun ScheduleScreen(
                                             width = 2.dp,
                                             color = ThirdThemeBackground,
                                             shape = RoundedCornerShape(10.dp)
-                                        ),
+                                        )
+                                        .clickable {
+                                            replacementDialogShow = true
+                                        },
                                     lessonItem = item
                                 )
 
@@ -147,35 +154,35 @@ fun ScheduleScreen(
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
                                     || index != 0 && prevLessonNumber == item.pairNumber) {
-                                    LessonCard(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .shadow(
-                                                elevation = 4.dp,
-                                                shape = RoundedCornerShape(10.dp),
-                                                clip = true,
-                                                spotColor = Color.Black.copy(alpha = 0.3f),
-                                                ambientColor = Color.Black.copy(alpha = 0.3f)
-                                            )
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(
-                                                color = FirstThemeBackground
-                                            )
-                                            .border(
-                                                width = 2.dp,
-                                                color = ThirdThemeBackground,
-                                                shape = RoundedCornerShape(10.dp)
-                                            ),
-                                        lessonList = listSeveralLessons
-                                    )
-
-                                    if (index != currentSchedule.lastIndex)
-                                        Spacer(
+                                        LessonCard(
                                             modifier = Modifier
-                                                .height(20.dp)
+                                                .fillMaxWidth()
+                                                .shadow(
+                                                    elevation = 4.dp,
+                                                    shape = RoundedCornerShape(10.dp),
+                                                    clip = true,
+                                                    spotColor = Color.Black.copy(alpha = 0.3f),
+                                                    ambientColor = Color.Black.copy(alpha = 0.3f)
+                                                )
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .background(
+                                                    color = FirstThemeBackground
+                                                )
+                                                .border(
+                                                    width = 2.dp,
+                                                    color = ThirdThemeBackground,
+                                                    shape = RoundedCornerShape(10.dp)
+                                                ),
+                                            lessonList = listSeveralLessons
                                         )
 
-                                    listSeveralLessons = ArrayList()
+                                        if (index != currentSchedule.lastIndex)
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                            )
+
+                                        listSeveralLessons = ArrayList()
                                 }
                             }
                         }
@@ -221,6 +228,13 @@ fun ScheduleScreen(
                 if (panelState.value == PanelState.CalendarPanel) {
                     panelState.value = PanelState.WeekPanel
                 }
+            }
+        )
+
+        ReplacementDialog(
+            showDialog = replacementDialogShow,
+            onDismissRequest = {
+                replacementDialogShow = false
             }
         )
     }
