@@ -66,7 +66,7 @@ fun SettingItem(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.secondary
             )
 
             Spacer(
@@ -79,7 +79,7 @@ fun SettingItem(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
-                color = Color.Black.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
             )
         }
 
@@ -90,7 +90,7 @@ fun SettingItem(
             Icon(
                 imageVector = ImageVector.vectorResource(id = imageResource),
                 contentDescription = null,
-                tint = GrayText
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
             )
         }
     }

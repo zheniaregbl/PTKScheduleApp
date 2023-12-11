@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -42,9 +43,8 @@ import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
-import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
-import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
@@ -54,7 +54,9 @@ import java.time.LocalDate
 fun ScheduleScreen(
     modifier: Modifier = Modifier,
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
-    isUpperWeek: Boolean = true
+    isUpperWeek: Boolean = true,
+    isDarkTheme: Boolean = false,
+    userThemeMode: ThemeMode = ThemeMode.FIRST
 ) {
     val viewModel = hiltViewModel<ScheduleViewModel>()
     val scheduleList = viewModel.currentSchedule.observeAsState()
@@ -130,17 +132,18 @@ fun ScheduleScreen(
                                         )
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(
-                                            color = FirstThemeBackground
+                                            color = MaterialTheme.colorScheme.onPrimary
                                         )
                                         .border(
                                             width = 2.dp,
-                                            color = ThirdThemeBackground,
+                                            color = MaterialTheme.colorScheme.inversePrimary,
                                             shape = RoundedCornerShape(10.dp)
                                         )
                                         .clickable {
                                             replacementDialogShow = true
                                         },
-                                    lessonItem = item
+                                    lessonItem = item,
+                                    isDark = isDarkTheme
                                 )
 
                                 if (index != currentSchedule.lastIndex)
@@ -161,19 +164,22 @@ fun ScheduleScreen(
                                                     elevation = 4.dp,
                                                     shape = RoundedCornerShape(10.dp),
                                                     clip = true,
-                                                    spotColor = Color.Black.copy(alpha = 0.3f),
-                                                    ambientColor = Color.Black.copy(alpha = 0.3f)
+                                                    spotColor = if (isDarkTheme) Color.Transparent
+                                                            else Color.Black.copy(alpha = 0.3f),
+                                                    ambientColor = if (isDarkTheme) Color.Transparent
+                                                            else Color.Black.copy(alpha = 0.3f)
                                                 )
                                                 .clip(RoundedCornerShape(10.dp))
                                                 .background(
-                                                    color = FirstThemeBackground
+                                                    color = MaterialTheme.colorScheme.onPrimary
                                                 )
                                                 .border(
                                                     width = 2.dp,
-                                                    color = ThirdThemeBackground,
+                                                    color = MaterialTheme.colorScheme.inversePrimary,
                                                     shape = RoundedCornerShape(10.dp)
                                                 ),
-                                            lessonList = listSeveralLessons
+                                            lessonList = listSeveralLessons,
+                                            isDark = isDarkTheme
                                         )
 
                                         if (index != currentSchedule.lastIndex)
@@ -228,14 +234,17 @@ fun ScheduleScreen(
                 if (panelState.value == PanelState.CalendarPanel) {
                     panelState.value = PanelState.WeekPanel
                 }
-            }
+            },
+            isDarkTheme = isDarkTheme
         )
 
         ReplacementDialog(
             showDialog = replacementDialogShow,
             onDismissRequest = {
                 replacementDialogShow = false
-            }
+            },
+            userThemeMode = userThemeMode,
+            isDarkTheme = isDarkTheme
         )
     }
 }

@@ -23,7 +23,8 @@ import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.Setting
 
 @Composable
 fun SettingScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToTheme: () -> Unit = { }
 ) {
 
     Box(
@@ -51,7 +52,7 @@ fun SettingScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.Center
                 )
             }
@@ -69,7 +70,7 @@ fun SettingScreen(
                             descriptionSetting = "Изменение цветовой темы приложения",
                             imageResource = R.drawable.svg_theme,
                             sizeImage = 30.dp,
-                            onClick = { }
+                            onClick = navigateToTheme
                         )
 
                         Spacer(
@@ -92,6 +93,34 @@ fun SettingScreen(
                             imageResource = R.drawable.svg_loop,
                             sizeImage = 30.dp,
                             onClick = { }
+                        )
+
+                        Spacer(
+                            modifier = Modifier
+                                .height(20.dp)
+                        )
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        SettingItem(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            titleSetting = "Сохранение замен",
+                            descriptionSetting = "Изменение количества недель, замены о которых " +
+                                    "сохраняются в памяти вашего устройства",
+                            imageResource = R.drawable.svg_folder,
+                            sizeImage = 30.dp,
+                            onClick = { }
+                        )
+
+                        Spacer(
+                            modifier = Modifier
+                                .height(20.dp)
                         )
                     }
                 }

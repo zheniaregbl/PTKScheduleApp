@@ -46,7 +46,7 @@ fun BottomMenu(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
-    currentRoute: String? = ScreenRoute.ScheduleScreen.route
+    selectedItemIndex: MutableState<Int> = mutableIntStateOf(0)
 ) {
 
     var transition by remember {
@@ -74,14 +74,6 @@ fun BottomMenu(
         )
     )
 
-    var selectedItemIndex by remember {
-        mutableIntStateOf(
-            if (!currentRoute.isNullOrEmpty() && currentRoute == ScreenRoute.SettingScreen.route)
-                1
-            else 0
-        )
-    }
-
     Box(
         modifier = modifier
     ) {
@@ -98,7 +90,7 @@ fun BottomMenu(
             contentAlignment = Alignment.Center
         ) {
             AnimatedContent(
-                targetState = selectedItemIndex,
+                targetState = selectedItemIndex.value,
                 label = "",
                 transitionSpec = {
                     fadeIn(animationSpec = tween(durationMillis = 400)) togetherWith
@@ -113,8 +105,8 @@ fun BottomMenu(
                             item = bottomNavItem,
                             isSelected = itemIndex == index,
                             onClick = { navItem ->
-                                if (selectedItemIndex != index && transition) {
-                                    selectedItemIndex = index
+                                if (itemIndex != index && transition) {
+                                    selectedItemIndex.value = index
 
 
                                     if (bottomNavItem.name == "setting")

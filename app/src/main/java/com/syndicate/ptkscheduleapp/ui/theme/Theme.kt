@@ -16,22 +16,26 @@ import androidx.core.view.WindowCompat
 
 private val firstTheme = lightColorScheme(
     onPrimary = FirstThemeBackground,
-    inversePrimary = SecondThemeBackground
+    inversePrimary = SecondThemeBackground,
+    secondary = Color.Black
 )
 
 private val secondTheme = lightColorScheme(
     onPrimary = SecondThemeBackground,
-    inversePrimary = FirstThemeBackground
+    inversePrimary = FirstThemeBackground,
+    secondary = Color.Black
 )
 
 private val thirdTheme = darkColorScheme(
     onPrimary = ThirdThemeBackground,
-    inversePrimary = GrayThirdTheme
+    inversePrimary = GrayThirdTheme,
+    secondary = Color.White
 )
 
 private val fourthTheme = darkColorScheme(
     onPrimary = FourthThemeBackground,
-    inversePrimary = ThirdThemeBackground
+    inversePrimary = ThirdThemeBackground,
+    secondary = Color.White
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,7 +58,7 @@ fun PTKScheduleAppTheme(
             val window = (view.context as Activity).window
 
             window.statusBarColor = Color.Transparent.toArgb()
-            window.navigationBarColor = colorScheme.onPrimary.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
 
             WindowCompat
                 .getInsetsController(window, view)

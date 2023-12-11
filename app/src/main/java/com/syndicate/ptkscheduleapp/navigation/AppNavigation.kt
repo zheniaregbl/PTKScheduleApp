@@ -23,6 +23,8 @@ import com.syndicate.ptkscheduleapp.ui.screens.role_selection_screen.RoleSelecti
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
 import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.SettingScreen
 import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
+import com.syndicate.ptkscheduleapp.ui.screens.theme_screen.ThemeScreen
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainEvent
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +74,8 @@ fun AppNavigation(
                     navController.navigate(ScreenRoute.ScheduleScreen.route) {
                         popUpTo(0)
                     }
-                }
+                },
+                userThemeMode = state.colorThemeMode
             )
         }
 
@@ -171,7 +174,12 @@ fun AppNavigation(
                     .fillMaxSize()
                     .padding(paddingValues),
                 panelState = panelState,
-                isUpperWeek = state.isUpperWeek
+                isUpperWeek = state.isUpperWeek,
+                isDarkTheme = when (state.colorThemeMode) {
+                    ThemeMode.FIRST, ThemeMode.SECOND -> false
+                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                },
+                userThemeMode = state.colorThemeMode
             )
         }
 
@@ -187,7 +195,35 @@ fun AppNavigation(
             SettingScreen(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(paddingValues),
+                navigateToTheme = {
+                    navController.navigate(ScreenRoute.ThemeScreen.route)
+                }
+            )
+        }
+
+        composable(
+            route = ScreenRoute.ThemeScreen.route,
+            enterTransition = {
+                fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(400))
+            }
+        ) {
+            ThemeScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                navigateToBack = {
+                    navController.navigate(ScreenRoute.SettingScreen.route) {
+                        popUpTo(0)
+                    }
+                },
+                changeTheme = { newThemeMode ->
+                    viewModel.onEvent(MainEvent.ChangeAppTheme(newThemeMode))
+                },
+                userThemeMode = state.colorThemeMode
             )
         }
     }

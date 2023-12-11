@@ -8,6 +8,7 @@ import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,10 @@ class MainViewModel @Inject constructor(
             is MainEvent.ChangeUserMode -> {
                 changeUserMode(event.newUserMode)
             }
+
+            is MainEvent.ChangeAppTheme -> {
+                changeAppTheme(event.newTheme)
+            }
         }
     }
 
@@ -81,17 +86,26 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
+            val appTheme = when (sharedPreferences.getInt("app_theme", 0)) {
+                1 -> ThemeMode.FIRST
+                2 -> ThemeMode.SECOND
+                3 -> ThemeMode.THIRD
+                4 -> ThemeMode.FOURTH
+                else -> ThemeMode.FIRST
+            }
 
             if (networkState) {
                 val isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
 
                 sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
                 state.update { it.copy(
+                    colorThemeMode = appTheme,
                     isUpperWeek = isUpperWeek,
                     isFirstStart = isFirstStart
                 ) }
             } else
                 state.update { it.copy(
+                    colorThemeMode = appTheme,
                     isUpperWeek = sharedPreferences.getBoolean("is_upper_week", true),
                     isFirstStart = isFirstStart
                 ) }
@@ -102,6 +116,23 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             state.update { it.copy(
                 userMode = newUserMode
+            ) }
+        }
+    }
+
+    private fun changeAppTheme(newTheme: ThemeMode) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val numberTheme = when (newTheme) {
+                ThemeMode.FIRST -> 1
+                ThemeMode.SECOND -> 2
+                ThemeMode.THIRD -> 3
+                ThemeMode.FOURTH -> 4
+            }
+
+            sharedPreferences.edit().putInt("app_theme", numberTheme).apply()
+
+            state.update { it.copy(
+                colorThemeMode = newTheme
             ) }
         }
     }

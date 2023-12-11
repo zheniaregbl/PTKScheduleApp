@@ -1,5 +1,8 @@
 package com.syndicate.ptkscheduleapp.navigation
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -36,12 +43,27 @@ fun AppNavGraph(
         ScreenRoute.SettingScreen.route
     )
 
+    val currentRoute = getCurrentRoute(navController = navController)
+    var selectedItemIndex = remember {
+        mutableIntStateOf(
+            if (!currentRoute.isNullOrEmpty() && currentRoute == ScreenRoute.SettingScreen.route)
+                1
+            else 0
+        )
+    }
+
     val showNavigationMenu = navController
         .currentBackStackEntryAsState().value?.destination?.route in routeList.map { it }
 
     val topDatePanelState = remember {
         mutableStateOf(PanelState.WeekPanel)
     }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = MaterialTheme.colorScheme.onPrimary,
+        label = "",
+        animationSpec = tween(400, easing = LinearEasing)
+    )
 
     Scaffold(
         modifier = Modifier
@@ -58,7 +80,7 @@ fun AppNavGraph(
                             .fillMaxWidth(),
                         navController = navController,
                         panelState = topDatePanelState,
-                        currentRoute = getCurrentRoute(navController = navController)
+                        selectedItemIndex = selectedItemIndex
                     )
                     Spacer(
                         modifier = Modifier
@@ -70,7 +92,7 @@ fun AppNavGraph(
         Surface(
             modifier = Modifier
                 .fillMaxSize(),
-            color = MaterialTheme.colorScheme.onPrimary
+            color = backgroundColor
         ) {
             AppNavigation(
                 navController = navController,

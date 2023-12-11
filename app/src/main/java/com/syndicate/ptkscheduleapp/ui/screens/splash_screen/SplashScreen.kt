@@ -2,12 +2,9 @@ package com.syndicate.ptkscheduleapp.ui.screens.splash_screen
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,18 +27,27 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.syndicate.ptkscheduleapp.R
+import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.ui.theme.MainBlue
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
     isFirstStart: Boolean = true,
+    userThemeMode: ThemeMode = ThemeMode.FIRST,
     navigateToRole: () -> Unit = { },
     navigateToSchedule: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(resId = R.raw.yaroslav_lottie_blue)
+        spec = LottieCompositionSpec.RawRes(
+            resId = when (userThemeMode) {
+                ThemeMode.FIRST -> R.raw.yaroslav_lottie_blue
+                ThemeMode.SECOND, ThemeMode.FOURTH -> R.raw.yaroslav_lottie_white
+                ThemeMode.THIRD -> R.raw.yaroslav_lottie_gray
+            }
+        )
     )
     var isPlaying by remember {
         mutableStateOf(true)
@@ -67,7 +74,11 @@ fun SplashScreen(
     }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
+            .background(
+                color = if (userThemeMode == ThemeMode.SECOND) MainBlue else Color.Transparent
+            )
+            .composed { modifier }
     ) {
         Box(
             modifier = Modifier
@@ -99,7 +110,11 @@ fun SplashScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
-                    color = MainBlue
+                    color = when (userThemeMode) {
+                        ThemeMode.FIRST -> MainBlue
+                        ThemeMode.SECOND, ThemeMode.FOURTH -> Color.White
+                        ThemeMode.THIRD -> GrayThirdTheme
+                    }
                 )
             }
         }

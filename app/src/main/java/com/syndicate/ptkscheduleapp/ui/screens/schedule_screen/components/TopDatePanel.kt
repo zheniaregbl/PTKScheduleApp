@@ -1,7 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -64,13 +63,13 @@ import kotlin.math.abs
 @SuppressLint("UnnecessaryComposedModifier")
 @Composable
 fun TopDatePanel(
-    modifier: Modifier = Modifier
-        .fillMaxSize(),
+    modifier: Modifier = Modifier,
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
     weekType: Boolean = true,
     changeSchedule: (DayOfWeek, Boolean) -> Unit = { _: DayOfWeek, _: Boolean -> },
-    hideCalendar: () -> Unit = { }
+    hideCalendar: () -> Unit = { },
+    isDarkTheme: Boolean = false
 ) {
     val weeks = getWeeksFromStartDate(
         LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
@@ -124,6 +123,8 @@ fun TopDatePanel(
         mutableIntStateOf(selectedDateState.value.year)
     }
 
+    val colorBorder = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+
     Box(
         modifier = Modifier
             .background(
@@ -142,33 +143,33 @@ fun TopDatePanel(
                     )
                 )
                 .background(
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 .drawBehind {
 
                     drawLine(
-                        color = GrayText.copy(alpha = 0.4f),
+                        color = colorBorder,
                         start = Offset(x = 25.dp.toPx(), y = size.height),
                         end = Offset(x = size.width - 25.dp.toPx(), y = size.height),
                         strokeWidth = 4.dp.toPx()
                     )
 
                     drawLine(
-                        color = GrayText.copy(alpha = 0.4f),
+                        color = colorBorder,
                         start = Offset(x = 0.dp.toPx(), y = 0.dp.toPx()),
                         end = Offset(x = 0.dp.toPx(), y = size.height),
                         strokeWidth = 4.dp.toPx()
                     )
 
                     drawLine(
-                        color = GrayText.copy(alpha = 0.4f),
+                        color = colorBorder,
                         start = Offset(x = size.width - 1.dp.toPx(), y = 0.dp.toPx()),
                         end = Offset(x = size.width - 1.dp.toPx(), y = size.height),
                         strokeWidth = 4.dp.toPx()
                     )
 
                     drawArc(
-                        color = GrayText.copy(alpha = 0.4f),
+                        color = colorBorder,
                         startAngle = 180f,
                         sweepAngle = -90f,
                         useCenter = false,
@@ -178,7 +179,7 @@ fun TopDatePanel(
                     )
 
                     drawArc(
-                        color = GrayText.copy(alpha = 0.4f),
+                        color = colorBorder,
                         startAngle = 360f,
                         sweepAngle = 90f,
                         useCenter = false,
@@ -249,7 +250,7 @@ fun TopDatePanel(
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Normal,
-                            color = Color.Black
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -273,7 +274,8 @@ fun TopDatePanel(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = GrayThirdTheme
+                                color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
+                                        else GrayThirdTheme
                             )
                         }
                     }
@@ -295,7 +297,8 @@ fun TopDatePanel(
                         pagerWeekStateSaved = pagerWeekStateSaved,
                         monthText = monthText,
                         yearText = yearText,
-                        changeSchedule = changeSchedule
+                        changeSchedule = changeSchedule,
+                        isDarkTheme = isDarkTheme
                     )
                 }
 
@@ -321,7 +324,8 @@ fun TopDatePanel(
                             monthText = monthText,
                             yearText = yearText,
                             changeSchedule = changeSchedule,
-                            hideCalendar = hideCalendar
+                            hideCalendar = hideCalendar,
+                            isDarkTheme = isDarkTheme
                         )
                     }
                 }
@@ -341,7 +345,8 @@ fun WeekPanel(
     pagerWeekStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
-    changeSchedule: (DayOfWeek, Boolean) -> Unit
+    changeSchedule: (DayOfWeek, Boolean) -> Unit,
+    isDarkTheme: Boolean = false
 ) {
     pagerWeekStateSaved.value = syncPanels(
         weeks,
@@ -422,7 +427,7 @@ fun WeekPanel(
                             }
                             .border(
                                 width = 1.5.dp,
-                                color = if (date == selectedDate.value) GrayText.copy(alpha = 0.6f) else Color.Transparent,
+                                color = if (date == selectedDate.value) GrayText else Color.Transparent,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -432,7 +437,8 @@ fun WeekPanel(
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
-                            color = GrayThirdTheme
+                            color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
+                                else GrayThirdTheme
                         )
                     }
                 }
@@ -454,7 +460,8 @@ fun Calendar(
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
     changeSchedule: (DayOfWeek, Boolean) -> Unit,
-    hideCalendar: () -> Unit
+    hideCalendar: () -> Unit,
+    isDarkTheme: Boolean = false
 ) {
     pagerMonthStateSaved.value = syncPanels(
         months,
@@ -527,7 +534,8 @@ fun Calendar(
                         week = week,
                         selectedDate = selectedDate,
                         changeSchedule = changeSchedule,
-                        hideCalendar = hideCalendar
+                        hideCalendar = hideCalendar,
+                        isDarkTheme = isDarkTheme
                     )
                 }
             }
@@ -543,7 +551,8 @@ fun WeekRow(
     week: List<LocalDate>,
     selectedDate: MutableState<LocalDate>,
     changeSchedule: (DayOfWeek, Boolean) -> Unit,
-    hideCalendar: () -> Unit
+    hideCalendar: () -> Unit,
+    isDarkTheme: Boolean = false
 ) {
     var currentDayOfWeek = DayOfWeek.MONDAY //DayOfWeek.SUNDAY
     var currentIndex = 0
@@ -563,7 +572,8 @@ fun WeekRow(
                     weekType = weekType,
                     weeks = weeks,
                     changeSchedule = changeSchedule,
-                    hideCalendar = hideCalendar
+                    hideCalendar = hideCalendar,
+                    isDarkTheme = isDarkTheme
                 )
 
                 if (currentIndex != week.size - 1)
@@ -577,7 +587,8 @@ fun WeekRow(
                     weekType = weekType,
                     weeks = weeks,
                     changeSchedule = changeSchedule,
-                    hideCalendar = hideCalendar
+                    hideCalendar = hideCalendar,
+                    isDarkTheme = isDarkTheme
                 )
             }
 
@@ -595,7 +606,8 @@ fun DayItem(
     weekType: Boolean,
     weeks: List<List<LocalDate>>,
     changeSchedule: (DayOfWeek, Boolean) -> Unit,
-    hideCalendar: () -> Unit
+    hideCalendar: () -> Unit,
+    isDarkTheme: Boolean = false
 ) {
 
     if (!isEmpty)
@@ -619,9 +631,7 @@ fun DayItem(
                 }
                 .border(
                     width = 1.5.dp,
-                    color = if (value == selectedDate.value) GrayText.copy(
-                        alpha = 0.6f
-                    ) else Color.Transparent,
+                    color = if (value == selectedDate.value) GrayText else Color.Transparent,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -631,7 +641,8 @@ fun DayItem(
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = GrayThirdTheme
+                color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
+                    else GrayThirdTheme
             )
         }
     else

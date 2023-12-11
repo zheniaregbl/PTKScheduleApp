@@ -37,18 +37,19 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.DialogWindowProvider
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
+import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
+import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 
 @Composable
@@ -140,6 +141,8 @@ fun CustomDialog(
 fun ReplacementDialog(
     showDialog: Boolean = true,
     onDismissRequest: () -> Unit = { },
+    userThemeMode: ThemeMode = ThemeMode.FIRST,
+    isDarkTheme: Boolean = false
 ) {
     CustomDialog(
         showDialog = showDialog,
@@ -152,7 +155,7 @@ fun ReplacementDialog(
                     RoundedCornerShape(10.dp)
                 )
                 .background(
-                    color = Color.White
+                    color = if (isDarkTheme) ThirdThemeBackground else FirstThemeBackground
                 )
         ) {
             Column(
@@ -164,7 +167,7 @@ fun ReplacementDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = ThirdThemeBackground
+                            color = if (isDarkTheme) GrayThirdTheme else SecondThemeBackground
                         )
                         .padding(
                             vertical = 10.dp
@@ -197,19 +200,22 @@ fun ReplacementDialog(
                                 elevation = 4.dp,
                                 shape = RoundedCornerShape(10.dp),
                                 clip = true,
-                                spotColor = Color.Black.copy(alpha = 0.3f),
-                                ambientColor = Color.Black.copy(alpha = 0.3f)
+                                spotColor = if (isDarkTheme) Color.Transparent
+                                else Color.Black.copy(alpha = 0.3f),
+                                ambientColor = if (isDarkTheme) Color.Transparent
+                                else Color.Black.copy(alpha = 0.3f)
                             )
                             .clip(RoundedCornerShape(10.dp))
                             .background(
-                                color = FirstThemeBackground
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                             .border(
                                 width = 2.dp,
-                                color = ThirdThemeBackground,
+                                color = MaterialTheme.colorScheme.inversePrimary,
                                 shape = RoundedCornerShape(10.dp)
                             ),
-                        lessonItem = LessonItem()
+                        lessonItem = LessonItem(),
+                        isDark = isDarkTheme
                     )
 
                     Spacer(
@@ -235,19 +241,22 @@ fun ReplacementDialog(
                                 elevation = 4.dp,
                                 shape = RoundedCornerShape(10.dp),
                                 clip = true,
-                                spotColor = Color.Black.copy(alpha = 0.3f),
-                                ambientColor = Color.Black.copy(alpha = 0.3f)
+                                spotColor = if (isDarkTheme) Color.Transparent
+                                else Color.Black.copy(alpha = 0.3f),
+                                ambientColor = if (isDarkTheme) Color.Transparent
+                                else Color.Black.copy(alpha = 0.3f)
                             )
                             .clip(RoundedCornerShape(10.dp))
                             .background(
-                                color = FirstThemeBackground
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                             .border(
                                 width = 2.dp,
-                                color = ThirdThemeBackground,
+                                color = MaterialTheme.colorScheme.inversePrimary,
                                 shape = RoundedCornerShape(10.dp)
                             ),
-                        lessonItem = LessonItem()
+                        lessonItem = LessonItem(),
+                        isDark = isDarkTheme
                     )
                 }
             }

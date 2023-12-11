@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
-import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import java.util.Random
 import kotlin.math.max
 import kotlin.math.min
@@ -37,7 +36,8 @@ fun LessonCard(
         lessonTitle = "Математика",
         teacher = "Ширина",
         room = "кабинет 410"
-    )
+    ),
+    isDark: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -59,7 +59,8 @@ fun LessonCard(
             )
             LessonInfo(
                 lessonItem = lessonItem,
-                isLast = true
+                isLast = true,
+                isDark = isDark
             )
         }
     }
@@ -71,7 +72,8 @@ fun LessonCard(
     lessonList: List<LessonItem> = listOf(
         LessonItem(),
         LessonItem()
-    )
+    ),
+    isDark: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -97,7 +99,8 @@ fun LessonCard(
                         lessonItem = lessonItem,
                         isDivision = true,
                         subgroup = lessonItem.subgroupNumber,
-                        isLast = index == lessonList.lastIndex
+                        isLast = index == lessonList.lastIndex,
+                        isDark = isDark
                     )
                 }
             }
@@ -115,7 +118,8 @@ fun LessonInfo(
     ),
     isDivision: Boolean = false,
     subgroup: Int = 1,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    isDark: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -127,7 +131,7 @@ fun LessonInfo(
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = if (isDark) Color.White else Color.Black
         )
         Spacer(
             modifier = Modifier
@@ -150,7 +154,7 @@ fun LessonInfo(
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color.Black
+                color = if (isDark) Color.White else Color.Black
             )
         if (isDivision) {
             Text(
@@ -158,7 +162,7 @@ fun LessonInfo(
                 style = MaterialTheme.typography.bodyMedium,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color.Black
+                color = if (isDark) Color.White else Color.Black
             )
         }
         if (!isLast) {
@@ -171,7 +175,7 @@ fun LessonInfo(
                     .fillMaxWidth()
                     .height(1.dp)
                     .background(
-                        color = ThirdThemeBackground
+                        color = GrayText
                     )
             )
         }
