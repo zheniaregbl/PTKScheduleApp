@@ -19,4 +19,7 @@ interface ScheduleApi {
 
     @GET("getgroup")
     suspend fun getListGroup(): Response<JsonObject>
+
+    @GET("replacement")
+    suspend fun getReplacement(): Response<JsonObject>
 }

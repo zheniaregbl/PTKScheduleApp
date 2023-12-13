@@ -7,5 +7,6 @@ data class LessonItem(
     val room: String = "410",
     val pairNumber: Int = 1,
     val isUpper: Boolean = false,
-    val subgroupNumber: Int = 0
+    val subgroupNumber: Int = 0,
+    val isAbsent: Boolean = false
 )

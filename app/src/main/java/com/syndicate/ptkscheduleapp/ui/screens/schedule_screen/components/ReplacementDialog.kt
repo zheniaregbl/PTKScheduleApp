@@ -1,5 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -68,7 +69,7 @@ fun CustomDialog(
     }
 
     if (showAnimatedDialog) {
-        
+
         Dialog(
             onDismissRequest = onDismissRequest,
             properties = DialogProperties(
@@ -85,7 +86,7 @@ fun CustomDialog(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                
+
                 var animateIn by remember {
                     mutableStateOf(false)
                 }
@@ -141,9 +142,17 @@ fun CustomDialog(
 fun ReplacementDialog(
     showDialog: Boolean = true,
     onDismissRequest: () -> Unit = { },
-    userThemeMode: ThemeMode = ThemeMode.FIRST,
+    main: List<LessonItem> = listOf(LessonItem()),
+    replacement: List<LessonItem> = listOf(LessonItem()),
     isDarkTheme: Boolean = false
 ) {
+
+    Log.d("checkMainLesson", main.joinToString())
+
+    main.forEach {
+        Log.d("checkMainLesson", (it.lessonTitle == "").toString())
+    }
+
     CustomDialog(
         showDialog = showDialog,
         onDismissRequest = onDismissRequest
@@ -193,30 +202,59 @@ fun ReplacementDialog(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    LessonCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(10.dp),
-                                clip = true,
-                                spotColor = if (isDarkTheme) Color.Transparent
-                                else Color.Black.copy(alpha = 0.3f),
-                                ambientColor = if (isDarkTheme) Color.Transparent
-                                else Color.Black.copy(alpha = 0.3f)
-                            )
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.inversePrimary,
-                                shape = RoundedCornerShape(10.dp)
-                            ),
-                        lessonItem = LessonItem(),
-                        isDark = isDarkTheme
-                    )
+                    if (main.size <= 1)
+                        LessonCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    clip = true,
+                                    spotColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f),
+                                    ambientColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f)
+                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.inversePrimary,
+                                    shape = RoundedCornerShape(10.dp)
+                                ),
+                            lessonItem = if (main.isEmpty()) LessonItem(
+                                time = replacement[0].time,
+                                isAbsent = true,
+                            ) else main[0],
+                            isDark = isDarkTheme
+                        )
+                    else
+                        LessonCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    clip = true,
+                                    spotColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f),
+                                    ambientColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f)
+                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.inversePrimary,
+                                    shape = RoundedCornerShape(10.dp)
+                                ),
+                            lessonList = main,
+                            isDark = isDarkTheme
+                        )
 
                     Spacer(
                         modifier = Modifier
@@ -234,30 +272,56 @@ fun ReplacementDialog(
                             .height(18.dp)
                     )
 
-                    LessonCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(10.dp),
-                                clip = true,
-                                spotColor = if (isDarkTheme) Color.Transparent
-                                else Color.Black.copy(alpha = 0.3f),
-                                ambientColor = if (isDarkTheme) Color.Transparent
-                                else Color.Black.copy(alpha = 0.3f)
-                            )
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.inversePrimary,
-                                shape = RoundedCornerShape(10.dp)
-                            ),
-                        lessonItem = LessonItem(),
-                        isDark = isDarkTheme
-                    )
+                    if (replacement.size <= 1)
+                        LessonCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    clip = true,
+                                    spotColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f),
+                                    ambientColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f)
+                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.inversePrimary,
+                                    shape = RoundedCornerShape(10.dp)
+                                ),
+                            lessonItem = replacement[0],
+                            isDark = isDarkTheme
+                        )
+                    else
+                        LessonCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .shadow(
+                                    elevation = 4.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    clip = true,
+                                    spotColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f),
+                                    ambientColor = if (isDarkTheme) Color.Transparent
+                                    else Color.Black.copy(alpha = 0.3f)
+                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.inversePrimary,
+                                    shape = RoundedCornerShape(10.dp)
+                                ),
+                            lessonList = replacement,
+                            isDark = isDarkTheme
+                        )
                 }
             }
         }

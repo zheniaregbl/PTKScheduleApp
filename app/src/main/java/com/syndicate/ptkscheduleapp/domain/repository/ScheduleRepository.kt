@@ -7,4 +7,5 @@ interface ScheduleRepository {
     suspend fun getScheduleOnWeek(group: String): JSONArray
     suspend fun getCurrentWeek(): JSONObject
     suspend fun getListGroupByCourse(course: String): JSONArray
+    suspend fun getReplacement(): JSONObject
 }

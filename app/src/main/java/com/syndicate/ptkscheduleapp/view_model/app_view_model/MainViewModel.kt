@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
     private val repository: ScheduleRepository,
     private val sharedPreferences: SharedPreferences,
     @ApplicationContext application: Context
-): ViewModel() {
+) : ViewModel() {
 
     val state = MutableStateFlow(MainState())
     private val context = MutableStateFlow(application)
@@ -39,9 +39,11 @@ class MainViewModel @Inject constructor(
             }
 
             is MainEvent.ChangeUserCourse -> {
-                state.update { it.copy(
-                    course = event.newUserCourse
-                ) }
+                state.update {
+                    it.copy(
+                        course = event.newUserCourse
+                    )
+                }
 
                 sharedPreferences.edit().putInt("user_course", event.newUserCourse).apply()
             }
@@ -49,9 +51,11 @@ class MainViewModel @Inject constructor(
             is MainEvent.ChangeUserGroup -> {
                 sharedPreferences.edit().putString("user_group", event.newUserGroup).apply()
 
-                state.update { it.copy(
-                    group = event.newUserGroup
-                ) }
+                state.update {
+                    it.copy(
+                        group = event.newUserGroup
+                    )
+                }
             }
 
             MainEvent.CreateConfiguration -> {
@@ -96,27 +100,36 @@ class MainViewModel @Inject constructor(
 
             if (networkState) {
                 val isUpperWeek = repository.getCurrentWeek().getBoolean("week_is_upper")
+                val replacementJson = repository.getReplacement()
 
                 sharedPreferences.edit().putBoolean("is_upper_week", isUpperWeek).apply()
-                state.update { it.copy(
-                    colorThemeMode = appTheme,
-                    isUpperWeek = isUpperWeek,
-                    isFirstStart = isFirstStart
-                ) }
+                sharedPreferences.edit().putString("replacement", replacementJson.toString()).apply()
+
+                state.update {
+                    it.copy(
+                        colorThemeMode = appTheme,
+                        isUpperWeek = isUpperWeek,
+                        isFirstStart = isFirstStart
+                    )
+                }
             } else
-                state.update { it.copy(
-                    colorThemeMode = appTheme,
-                    isUpperWeek = sharedPreferences.getBoolean("is_upper_week", true),
-                    isFirstStart = isFirstStart
-                ) }
+                state.update {
+                    it.copy(
+                        colorThemeMode = appTheme,
+                        isUpperWeek = sharedPreferences.getBoolean("is_upper_week", true),
+                        isFirstStart = isFirstStart
+                    )
+                }
         }
     }
 
     private fun changeUserMode(newUserMode: UserMode) {
         viewModelScope.launch(Dispatchers.IO) {
-            state.update { it.copy(
-                userMode = newUserMode
-            ) }
+            state.update {
+                it.copy(
+                    userMode = newUserMode
+                )
+            }
         }
     }
 
@@ -131,9 +144,11 @@ class MainViewModel @Inject constructor(
 
             sharedPreferences.edit().putInt("app_theme", numberTheme).apply()
 
-            state.update { it.copy(
-                colorThemeMode = newTheme
-            ) }
+            state.update {
+                it.copy(
+                    colorThemeMode = newTheme
+                )
+            }
         }
     }
 

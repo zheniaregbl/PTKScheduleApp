@@ -178,8 +178,7 @@ fun AppNavigation(
                 isDarkTheme = when (state.colorThemeMode) {
                     ThemeMode.FIRST, ThemeMode.SECOND -> false
                     ThemeMode.THIRD, ThemeMode.FOURTH -> true
-                },
-                userThemeMode = state.colorThemeMode
+                }
             )
         }
 

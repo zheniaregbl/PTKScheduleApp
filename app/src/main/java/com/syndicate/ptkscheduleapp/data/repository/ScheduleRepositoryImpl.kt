@@ -34,4 +34,10 @@ class ScheduleRepositoryImpl @Inject constructor(
             JSONObject(response.body().toString()).getJSONArray(course)
         else JSONArray()
     }
+
+    override suspend fun getReplacement(): JSONObject = withContext(Dispatchers.IO) {
+        val response = scheduleApi.getReplacement()
+
+        if (response.isSuccessful) JSONObject(response.body().toString()) else JSONObject()
+    }
 }

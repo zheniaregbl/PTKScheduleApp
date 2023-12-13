@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,11 +39,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
+import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
+import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
@@ -55,14 +55,18 @@ fun ScheduleScreen(
     modifier: Modifier = Modifier,
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     isUpperWeek: Boolean = true,
-    isDarkTheme: Boolean = false,
-    userThemeMode: ThemeMode = ThemeMode.FIRST
+    isDarkTheme: Boolean = false
 ) {
     val viewModel = hiltViewModel<ScheduleViewModel>()
     val scheduleList = viewModel.currentSchedule.observeAsState()
-    val currentSchedule = if (scheduleList.value.isNullOrEmpty()) {
+    val replacement = viewModel.dayReplacement.observeAsState()
+
+    val scheduleWithReplacement = applyReplacementSchedule(scheduleList.value, replacement.value)
+    val replacementPairNumbers = fillListReplacementNumber(replacement.value)
+
+    val currentSchedule = if (scheduleWithReplacement.isNullOrEmpty()) {
         emptyList()
-    } else scheduleList.value!!
+    } else scheduleWithReplacement
 
     val selectedDateState = remember {
         mutableStateOf(LocalDate.now())
@@ -72,19 +76,28 @@ fun ScheduleScreen(
         mutableStateOf(false)
     }
 
+    var mainLesson by remember {
+        mutableStateOf(emptyList<LessonItem>())
+    }
+    var replacementLesson by remember {
+        mutableStateOf(emptyList<LessonItem>())
+    }
+
     var listSeveralLessons = ArrayList<LessonItem>()
     var prevLessonNumber = -1
 
     LaunchedEffect(Unit) {
         delay(300)
-        viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek))
+        viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek, selectedDateState.value))
     }
 
     Box(
         modifier = Modifier
             .pointerInput(Unit) {
-                detectTapGestures { if (panelState.value == PanelState.CalendarPanel)
-                    panelState.value = PanelState.WeekPanel }
+                detectTapGestures {
+                    if (panelState.value == PanelState.CalendarPanel)
+                        panelState.value = PanelState.WeekPanel
+                }
             }
             .composed { modifier }
     ) {
@@ -120,6 +133,14 @@ fun ScheduleScreen(
 
                         if (item.lessonTitle != "") {
                             if (item.subgroupNumber == 0) {
+
+                                val list = ArrayList<LessonItem>()
+
+                                scheduleList.value?.forEach {
+                                    if (it.pairNumber == item.pairNumber)
+                                        list.add(it)
+                                }
+
                                 LessonCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -140,10 +161,17 @@ fun ScheduleScreen(
                                             shape = RoundedCornerShape(10.dp)
                                         )
                                         .clickable {
-                                            replacementDialogShow = true
+                                            if (item.pairNumber in replacementPairNumbers) {
+                                                replacementDialogShow = true
+
+                                                mainLesson = list
+                                                replacementLesson = listOf(item)
+                                            }
                                         },
                                     lessonItem = item,
-                                    isDark = isDarkTheme
+                                    isDark = isDarkTheme,
+                                    isReplacement = item.pairNumber in replacementPairNumbers,
+                                    replacement = list
                                 )
 
                                 if (index != currentSchedule.lastIndex)
@@ -156,44 +184,46 @@ fun ScheduleScreen(
 
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
-                                    || index != 0 && prevLessonNumber == item.pairNumber) {
-                                        LessonCard(
+                                    || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != item.pairNumber
+                                    || index != 0 && prevLessonNumber == item.pairNumber
+                                ) {
+                                    LessonCard(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .shadow(
+                                                elevation = 4.dp,
+                                                shape = RoundedCornerShape(10.dp),
+                                                clip = true,
+                                                spotColor = if (isDarkTheme) Color.Transparent
+                                                else Color.Black.copy(alpha = 0.3f),
+                                                ambientColor = if (isDarkTheme) Color.Transparent
+                                                else Color.Black.copy(alpha = 0.3f)
+                                            )
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                            .border(
+                                                width = 2.dp,
+                                                color = MaterialTheme.colorScheme.inversePrimary,
+                                                shape = RoundedCornerShape(10.dp)
+                                            ),
+                                        lessonList = listSeveralLessons,
+                                        isDark = isDarkTheme
+                                    )
+
+                                    if (index != currentSchedule.lastIndex)
+                                        Spacer(
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .shadow(
-                                                    elevation = 4.dp,
-                                                    shape = RoundedCornerShape(10.dp),
-                                                    clip = true,
-                                                    spotColor = if (isDarkTheme) Color.Transparent
-                                                            else Color.Black.copy(alpha = 0.3f),
-                                                    ambientColor = if (isDarkTheme) Color.Transparent
-                                                            else Color.Black.copy(alpha = 0.3f)
-                                                )
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.onPrimary
-                                                )
-                                                .border(
-                                                    width = 2.dp,
-                                                    color = MaterialTheme.colorScheme.inversePrimary,
-                                                    shape = RoundedCornerShape(10.dp)
-                                                ),
-                                            lessonList = listSeveralLessons,
-                                            isDark = isDarkTheme
+                                                .height(20.dp)
                                         )
 
-                                        if (index != currentSchedule.lastIndex)
-                                            Spacer(
-                                                modifier = Modifier
-                                                    .height(20.dp)
-                                            )
-
-                                        listSeveralLessons = ArrayList()
+                                    listSeveralLessons = ArrayList()
                                 }
                             }
                         }
                     }
-                    
+
                 } else {
 
                     items(4) { index ->
@@ -226,9 +256,12 @@ fun ScheduleScreen(
                 .fillMaxSize(),
             panelState = panelState,
             selectedDateState = selectedDateState,
+            updateReplacement = { date ->
+                viewModel.onEvent(ScheduleEvent.GetReplacement(date))
+            },
             weekType = isUpperWeek,
-            changeSchedule = { dayOfWeek, typeWeek ->
-                viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek))
+            changeSchedule = { dayOfWeek, typeWeek, date ->
+                viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek, date))
             },
             hideCalendar = {
                 if (panelState.value == PanelState.CalendarPanel) {
@@ -243,7 +276,8 @@ fun ScheduleScreen(
             onDismissRequest = {
                 replacementDialogShow = false
             },
-            userThemeMode = userThemeMode,
+            main = mainLesson,
+            replacement = replacementLesson,
             isDarkTheme = isDarkTheme
         )
     }

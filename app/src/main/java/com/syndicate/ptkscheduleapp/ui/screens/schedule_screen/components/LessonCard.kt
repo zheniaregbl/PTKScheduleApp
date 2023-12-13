@@ -10,18 +10,24 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import java.util.Random
@@ -37,7 +43,9 @@ fun LessonCard(
         teacher = "Ширина",
         room = "кабинет 410"
     ),
-    isDark: Boolean = false
+    isDark: Boolean = false,
+    isReplacement: Boolean = false,
+    replacement: List<LessonItem> = emptyList(),
 ) {
     Box(
         modifier = modifier
@@ -63,6 +71,22 @@ fun LessonCard(
                 isDark = isDark
             )
         }
+
+        if (isReplacement)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 10.dp,
+                        end = 10.dp
+                    )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.svg_replacement),
+                    contentDescription = null,
+                    tint = GrayText
+                )
+            }
     }
 }
 
@@ -73,7 +97,9 @@ fun LessonCard(
         LessonItem(),
         LessonItem()
     ),
-    isDark: Boolean = false
+    isDark: Boolean = false,
+    isReplacement: Boolean = false,
+    replacement: List<LessonItem> = emptyList()
 ) {
     Box(
         modifier = modifier
@@ -105,6 +131,22 @@ fun LessonCard(
                 }
             }
         }
+
+        if (isReplacement)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 10.dp,
+                        end = 10.dp
+                    )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.svg_replacement),
+                    contentDescription = null,
+                    tint = GrayText
+                )
+            }
     }
 }
 
@@ -138,17 +180,20 @@ fun LessonInfo(
                 .height(3.dp)
         )
         Text(
-            text = lessonItem.lessonTitle,
+            text = if (lessonItem.lessonTitle == "" || lessonItem.isAbsent) "Не будет" else lessonItem.lessonTitle,
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
             color = GrayText
         )
+
         Spacer(
             modifier = Modifier
                 .height(3.dp)
         )
-        if (lessonItem.teacher != "Не указан" && lessonItem.room != "Не указан")
+        if (lessonItem.teacher != "Не указан" && lessonItem.room != "Не указан" &&
+            lessonItem.lessonTitle != "Не будет" && lessonItem.lessonTitle != "" &&
+            !lessonItem.isAbsent)
             Text(
                 text = "${lessonItem.teacher}, кабинет ${lessonItem.room}",
                 style = MaterialTheme.typography.bodyMedium,
@@ -165,6 +210,7 @@ fun LessonInfo(
                 color = if (isDark) Color.White else Color.Black
             )
         }
+
         if (!isLast) {
             Spacer(
                 modifier = Modifier
