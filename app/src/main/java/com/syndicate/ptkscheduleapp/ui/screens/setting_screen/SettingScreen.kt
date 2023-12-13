@@ -126,7 +126,7 @@ fun SettingScreen(
                     }
                 }
 
-                item {
+                /*item {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -147,7 +147,7 @@ fun SettingScreen(
                                 .height(20.dp)
                         )
                     }
-                }
+                }*/
             }
         }
 
