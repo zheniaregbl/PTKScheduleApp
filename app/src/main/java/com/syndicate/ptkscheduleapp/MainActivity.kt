@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel = hiltViewModel<MainViewModel>()
             val state by viewModel.state.collectAsState()
+            val firstVisitSchedule by viewModel.firstVisitSchedule.collectAsState()
 
             PTKScheduleAppTheme(
                 themeMode = state.colorThemeMode,
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 
                 AppNavGraph(
                     state = state,
+                    firstVisitSchedule = firstVisitSchedule,
                     viewModel = viewModel
                 )
             }

@@ -51,7 +51,7 @@ fun CourseSelectionScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -81,7 +81,7 @@ fun CourseSelectionScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(
-                            color = SecondThemeBackground
+                            color = MaterialTheme.colorScheme.inversePrimary
                         )
                         .padding(
                             horizontal = 82.dp,
@@ -92,7 +92,7 @@ fun CourseSelectionScreen(
                     },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
-                    textColor = Color.Black
+                    textColor = MaterialTheme.colorScheme.secondary
                 )
             }
         }

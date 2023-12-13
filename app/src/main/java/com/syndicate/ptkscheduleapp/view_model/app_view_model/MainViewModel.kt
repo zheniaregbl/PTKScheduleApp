@@ -24,6 +24,8 @@ class MainViewModel @Inject constructor(
     @ApplicationContext application: Context
 ) : ViewModel() {
 
+    val firstVisitSchedule = MutableStateFlow(true)
+
     val state = MutableStateFlow(MainState())
     private val context = MutableStateFlow(application)
 
@@ -68,6 +70,10 @@ class MainViewModel @Inject constructor(
 
             is MainEvent.ChangeAppTheme -> {
                 changeAppTheme(event.newTheme)
+            }
+
+            MainEvent.FirstVisitSchedule -> {
+                firstVisitSchedule.update { false }
             }
         }
     }

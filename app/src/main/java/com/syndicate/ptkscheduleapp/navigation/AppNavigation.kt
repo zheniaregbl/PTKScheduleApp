@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 fun AppNavigation(
     navController: NavHostController,
     state: MainState,
+    firstVisitSchedule: Boolean,
     panelState: MutableState<PanelState>,
     viewModel: MainViewModel,
     paddingValues: PaddingValues
@@ -146,7 +147,7 @@ fun AppNavigation(
                         viewModel.onEvent(MainEvent.ReceiveScheduleFromServer)
                         viewModel.onEvent(MainEvent.CreateConfiguration)
 
-                        delay(1000)
+                        delay(1500)
 
                         navController.navigate(ScreenRoute.ScheduleScreen.route) {
                             popUpTo(0)
@@ -173,6 +174,10 @@ fun AppNavigation(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
+                firstVisitSchedule = firstVisitSchedule,
+                onFirstVisit = {
+                    viewModel.onEvent(MainEvent.FirstVisitSchedule)
+                },
                 panelState = panelState,
                 isUpperWeek = state.isUpperWeek,
                 isDarkTheme = when (state.colorThemeMode) {
@@ -195,8 +200,15 @@ fun AppNavigation(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
+                isDarkTheme = when (state.colorThemeMode) {
+                    ThemeMode.FIRST, ThemeMode.SECOND -> false
+                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                },
                 navigateToTheme = {
                     navController.navigate(ScreenRoute.ThemeScreen.route)
+                },
+                navigateToReselectGroup = {
+                    navController.navigate(ScreenRoute.CourseSelectionScreen.route)
                 }
             )
         }

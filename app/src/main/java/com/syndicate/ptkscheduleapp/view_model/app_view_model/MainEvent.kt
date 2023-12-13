@@ -24,4 +24,6 @@ sealed interface MainEvent {
     data class ChangeAppTheme(
         val newTheme: ThemeMode
     ): MainEvent
+
+    data object FirstVisitSchedule: MainEvent
 }

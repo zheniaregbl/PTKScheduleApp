@@ -46,7 +46,8 @@ fun BottomMenu(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
-    selectedItemIndex: MutableState<Int> = mutableIntStateOf(0)
+    selectedItemIndex: MutableState<Int> = mutableIntStateOf(0),
+    isDarkTheme: Boolean = false
 ) {
 
     var transition by remember {
@@ -103,6 +104,7 @@ fun BottomMenu(
                     items.forEachIndexed { index, bottomNavItem ->
                         BottomMenuItem(
                             item = bottomNavItem,
+                            isDarkTheme = isDarkTheme,
                             isSelected = itemIndex == index,
                             onClick = { navItem ->
                                 if (itemIndex != index && transition) {
@@ -135,6 +137,7 @@ fun BottomMenu(
 @Composable
 fun BottomMenuItem(
     item: BottomNavItem,
+    isDarkTheme: Boolean = false,
     isSelected: Boolean = false,
     onClick: (BottomNavItem) -> Unit
 ) {
@@ -154,7 +157,8 @@ fun BottomMenuItem(
                 .size(35.dp),
             imageVector = item.icon,
             contentDescription = null,
-            tint = if (isSelected) ActiveNavItemColor else InactiveNavItemColor
+            tint = if (isSelected) if (isDarkTheme) InactiveNavItemColor else ActiveNavItemColor
+            else if (isDarkTheme) ActiveNavItemColor else InactiveNavItemColor
         )
     }
 }

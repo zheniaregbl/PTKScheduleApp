@@ -26,12 +26,14 @@ import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.navigation.utils.getCurrentRoute
 import com.syndicate.ptkscheduleapp.ui.bottom_navigation_bar.BottomMenu
+import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     state: MainState,
+    firstVisitSchedule: Boolean,
     viewModel: MainViewModel
 ) {
     val routeList = listOf(
@@ -76,7 +78,11 @@ fun AppNavGraph(
                             .fillMaxWidth(),
                         navController = navController,
                         panelState = topDatePanelState,
-                        selectedItemIndex = selectedItemIndex
+                        selectedItemIndex = selectedItemIndex,
+                        isDarkTheme = when (state.colorThemeMode) {
+                            ThemeMode.FIRST, ThemeMode.SECOND -> false
+                            ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                        }
                     )
                     Spacer(
                         modifier = Modifier
@@ -93,6 +99,7 @@ fun AppNavGraph(
             AppNavigation(
                 navController = navController,
                 state = state,
+                firstVisitSchedule = firstVisitSchedule,
                 panelState = topDatePanelState,
                 viewModel = viewModel,
                 paddingValues = paddingValues

@@ -11,21 +11,39 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
+import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
+import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.NetworkConnectionDialogWithRetry
 import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.SettingItem
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    navigateToTheme: () -> Unit = { }
+    isDarkTheme: Boolean = false,
+    navigateToTheme: () -> Unit = { },
+    navigateToReselectGroup: () -> Unit = { }
 ) {
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var connectionDialogShow by remember {
+        mutableStateOf(false)
+    }
 
     Box(
         modifier = modifier
@@ -92,7 +110,13 @@ fun SettingScreen(
                             descriptionSetting = "Изменение группы для получения расписания",
                             imageResource = R.drawable.svg_loop,
                             sizeImage = 30.dp,
-                            onClick = { }
+                            onClick = {
+
+                                if (isNetworkAvailable(context))
+                                    navigateToReselectGroup()
+                                else
+                                    connectionDialogShow = true
+                            }
                         )
 
                         Spacer(
@@ -126,6 +150,23 @@ fun SettingScreen(
                 }
             }
         }
+
+        NetworkConnectionDialogWithRetry(
+            showDialog = connectionDialogShow,
+            onDismissRequest = {
+                connectionDialogShow = false
+            },
+            onRetry = {
+                scope.launch {
+                    delay(400)
+                    if (isNetworkAvailable(context))
+                        navigateToReselectGroup()
+                    else
+                        connectionDialogShow = true
+                }
+            },
+            isDarkTheme = isDarkTheme
+        )
     }
 }
 

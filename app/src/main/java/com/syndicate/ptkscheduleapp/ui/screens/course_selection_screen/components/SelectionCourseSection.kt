@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
+import com.syndicate.ptkscheduleapp.ui.theme.GrayText
+import com.syndicate.ptkscheduleapp.ui.theme.MainBlue
 
 @Composable
 fun SelectionCourseSection(
@@ -56,14 +59,15 @@ fun SelectionCourseSection(
                     animationSpec = tween(225),
                     label = ""
                 ) { targetState ->
-                    Image(
+                    Icon(
                         modifier = Modifier
                             .size(30.dp),
                         imageVector = ImageVector.vectorResource(
                             id = if ("$targetState курс" == label)
                                 R.drawable.svg_radio_checked else R.drawable.svg_radio_default
                         ),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = if ("$targetState курс" == label) MainBlue else MaterialTheme.colorScheme.secondary
                     )
                 }
                 Spacer(
@@ -75,7 +79,7 @@ fun SelectionCourseSection(
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
             Spacer(

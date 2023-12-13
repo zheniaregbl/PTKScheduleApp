@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -98,7 +99,7 @@ fun GroupPicker(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = textStyle,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontSize = fontSize,
                     modifier = Modifier
                         .onSizeChanged { size -> itemHeightPixels.value = size.height }

@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,10 +42,12 @@ import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
+import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
+import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.NetworkConnectionDialogWithRetry
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
@@ -53,10 +56,15 @@ import java.time.LocalDate
 @Composable
 fun ScheduleScreen(
     modifier: Modifier = Modifier,
+    firstVisitSchedule: Boolean = false,
+    onFirstVisit: () -> Unit = { },
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     isUpperWeek: Boolean = true,
     isDarkTheme: Boolean = false
 ) {
+
+    val context = LocalContext.current
+
     val viewModel = hiltViewModel<ScheduleViewModel>()
     val scheduleList = viewModel.currentSchedule.observeAsState()
     val replacement = viewModel.dayReplacement.observeAsState()
@@ -75,6 +83,9 @@ fun ScheduleScreen(
     var replacementDialogShow by remember {
         mutableStateOf(false)
     }
+    var connectionDialogShow by remember {
+        mutableStateOf(false)
+    }
 
     var mainLesson by remember {
         mutableStateOf(emptyList<LessonItem>())
@@ -89,6 +100,12 @@ fun ScheduleScreen(
     LaunchedEffect(Unit) {
         delay(300)
         viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek, selectedDateState.value))
+
+        if (firstVisitSchedule && !isNetworkAvailable(context)) {
+
+            connectionDialogShow = true
+            onFirstVisit()
+        }
     }
 
     Box(
@@ -278,6 +295,15 @@ fun ScheduleScreen(
             },
             main = mainLesson,
             replacement = replacementLesson,
+            isDarkTheme = isDarkTheme
+        )
+
+        NetworkConnectionDialogWithRetry(
+            showDialog = connectionDialogShow,
+            onDismissRequest = {
+                connectionDialogShow = false
+            },
+            havaRetry = false,
             isDarkTheme = isDarkTheme
         )
     }

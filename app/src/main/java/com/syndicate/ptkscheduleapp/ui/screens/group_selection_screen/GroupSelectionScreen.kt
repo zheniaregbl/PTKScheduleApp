@@ -64,7 +64,7 @@ fun GroupSelectionScreen(
         mutableStateOf(false)
     }
     val progress by animateLottieCompositionAsState(
-        composition =  composition,
+        composition = composition,
         isPlaying = isLoading,
         speed = 1f
     )
@@ -99,7 +99,7 @@ fun GroupSelectionScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.Center
                 )
             }
