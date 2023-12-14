@@ -45,6 +45,7 @@ import kotlinx.coroutines.delay
 fun BottomMenu(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    currentRoute: String? = "",
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     selectedItemIndex: MutableState<Int> = mutableIntStateOf(0),
     isDarkTheme: Boolean = false
@@ -54,7 +55,12 @@ fun BottomMenu(
         mutableStateOf(true)
     }
 
-    LaunchedEffect(key1 = transition) {
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == ScreenRoute.ScheduleScreen.route)
+            selectedItemIndex.value = 0
+    }
+
+    LaunchedEffect(transition) {
         if (!transition) {
             delay(200)
 

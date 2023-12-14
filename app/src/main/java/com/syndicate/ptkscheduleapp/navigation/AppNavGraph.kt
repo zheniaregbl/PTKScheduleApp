@@ -42,6 +42,7 @@ fun AppNavGraph(
     )
 
     val currentRoute = getCurrentRoute(navController = navController)
+
     val selectedItemIndex = remember {
         mutableIntStateOf(
             if (!currentRoute.isNullOrEmpty() && currentRoute == ScreenRoute.SettingScreen.route)
@@ -77,6 +78,7 @@ fun AppNavGraph(
                         modifier = Modifier
                             .fillMaxWidth(),
                         navController = navController,
+                        currentRoute = currentRoute,
                         panelState = topDatePanelState,
                         selectedItemIndex = selectedItemIndex,
                         isDarkTheme = when (state.colorThemeMode) {

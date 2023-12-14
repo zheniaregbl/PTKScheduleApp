@@ -96,12 +96,20 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
+
             val appTheme = when (sharedPreferences.getInt("app_theme", 0)) {
                 1 -> ThemeMode.FIRST
                 2 -> ThemeMode.SECOND
                 3 -> ThemeMode.THIRD
                 4 -> ThemeMode.FOURTH
                 else -> ThemeMode.FIRST
+            }
+
+            state.update {
+                it.copy(
+                    isFirstStart = isFirstStart,
+                    colorThemeMode = appTheme
+                )
             }
 
             if (networkState) {
@@ -113,17 +121,13 @@ class MainViewModel @Inject constructor(
 
                 state.update {
                     it.copy(
-                        colorThemeMode = appTheme,
-                        isUpperWeek = isUpperWeek,
-                        isFirstStart = isFirstStart
+                        isUpperWeek = isUpperWeek
                     )
                 }
             } else
                 state.update {
                     it.copy(
-                        colorThemeMode = appTheme,
-                        isUpperWeek = sharedPreferences.getBoolean("is_upper_week", true),
-                        isFirstStart = isFirstStart
+                        isUpperWeek = sharedPreferences.getBoolean("is_upper_week", true)
                     )
                 }
         }

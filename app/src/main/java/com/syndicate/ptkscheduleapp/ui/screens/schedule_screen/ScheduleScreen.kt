@@ -1,6 +1,8 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -35,12 +38,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
+import com.syndicate.ptkscheduleapp.data.model.ShowScheduleState
 import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
+import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
@@ -65,6 +72,10 @@ fun ScheduleScreen(
 
     val context = LocalContext.current
 
+    var showScheduleState by remember {
+        mutableStateOf(ShowScheduleState.LOADING)
+    }
+
     val viewModel = hiltViewModel<ScheduleViewModel>()
     val scheduleList = viewModel.currentSchedule.observeAsState()
     val replacement = viewModel.dayReplacement.observeAsState()
@@ -72,9 +83,11 @@ fun ScheduleScreen(
     val scheduleWithReplacement = applyReplacementSchedule(scheduleList.value, replacement.value)
     val replacementPairNumbers = fillListReplacementNumber(replacement.value)
 
-    val currentSchedule = if (scheduleWithReplacement.isNullOrEmpty()) {
+    val currentScheduleNullable = deleteEmptyLesson(scheduleWithReplacement)
+
+    val currentSchedule = if (currentScheduleNullable.isNullOrEmpty()) {
         emptyList()
-    } else scheduleWithReplacement
+    } else currentScheduleNullable
 
     val selectedDateState = remember {
         mutableStateOf(LocalDate.now())
@@ -100,6 +113,8 @@ fun ScheduleScreen(
     LaunchedEffect(Unit) {
         delay(300)
         viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek, selectedDateState.value))
+
+        showScheduleState = ShowScheduleState.SHOW
 
         if (firstVisitSchedule && !isNetworkAvailable(context)) {
 
@@ -142,7 +157,7 @@ fun ScheduleScreen(
                     )
                 }
 
-                if (currentSchedule.isNotEmpty()) {
+                if (showScheduleState == ShowScheduleState.SHOW && currentSchedule.isNotEmpty()) {
 
                     itemsIndexed(currentSchedule) { index, item ->
 
@@ -199,6 +214,13 @@ fun ScheduleScreen(
                             } else {
                                 listSeveralLessons.add(item)
 
+                                val list = ArrayList<LessonItem>()
+
+                                scheduleList.value?.forEach {
+                                    if (it.pairNumber == item.pairNumber)
+                                        list.add(it)
+                                }
+
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
                                     || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != item.pairNumber
@@ -224,9 +246,19 @@ fun ScheduleScreen(
                                                 width = 2.dp,
                                                 color = MaterialTheme.colorScheme.inversePrimary,
                                                 shape = RoundedCornerShape(10.dp)
-                                            ),
+                                            )
+                                            .clickable {
+                                                if (item.pairNumber in replacementPairNumbers) {
+                                                    replacementDialogShow = true
+
+                                                    mainLesson = list
+                                                    replacementLesson = listOf(item)
+                                                }
+                                            },
                                         lessonList = listSeveralLessons,
-                                        isDark = isDarkTheme
+                                        isDark = isDarkTheme,
+                                        isReplacement = item.pairNumber in replacementPairNumbers,
+                                        replacement = list
                                     )
 
                                     if (index != currentSchedule.lastIndex)
@@ -241,7 +273,7 @@ fun ScheduleScreen(
                         }
                     }
 
-                } else {
+                } else if (currentSchedule.isEmpty() && showScheduleState == ShowScheduleState.LOADING) {
 
                     items(4) { index ->
 
@@ -257,6 +289,7 @@ fun ScheduleScreen(
                                     .height(20.dp)
                             )
                     }
+
                 }
 
                 item {
@@ -265,6 +298,28 @@ fun ScheduleScreen(
                             .height(20.dp)
                     )
                 }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = currentSchedule.isEmpty() && showScheduleState == ShowScheduleState.SHOW,
+            enter = fadeIn(animationSpec = tween(500)),
+            exit = fadeOut(animationSpec = tween(100))
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "Нет занятий",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
 
