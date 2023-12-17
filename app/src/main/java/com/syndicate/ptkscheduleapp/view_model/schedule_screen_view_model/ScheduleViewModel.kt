@@ -1,6 +1,7 @@
 package com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -85,6 +86,8 @@ class ScheduleViewModel @Inject constructor(
             DayOfWeek.SATURDAY -> _scheduleList.value?.get(5)
             DayOfWeek.SUNDAY -> emptyList()
         }
+
+        Log.d("listSchedule", daySchedule?.joinToString() ?: "")
 
         _currentSchedule.postValue(
             filterSchedule(daySchedule, isUpperWeek)

@@ -13,7 +13,7 @@ fun filterSchedule(
         inputSchedule
     }
 
-    val resultList = ArrayList<LessonItem>()
+    var resultList = ArrayList<LessonItem>()
     val upperPair = ArrayList<LessonItem>()
     val numbers = ArrayList<Int>()
     val upperNumbers = ArrayList<Int>()
@@ -31,20 +31,22 @@ fun filterSchedule(
 
     if (isUpper) {
 
-        for (i in 0..<resultList.size) {
-            val pair = resultList[i]
+        val tempList = ArrayList<LessonItem>()
+        val forAllPairNumbers = ArrayList<Int>()
 
-            if (pair.pairNumber in upperNumbers) {
-                upperPair.forEach {
-                    if (pair.pairNumber == it.pairNumber && pair.subgroupNumber == it.subgroupNumber)
-                        resultList[i] = it
-                }
-            }
+        upperPair.forEach {
+            if (it.subgroupNumber == 0)
+                forAllPairNumbers.add(it.pairNumber)
         }
-    }
 
-    upperPair.forEach {
-        if (it.pairNumber !in numbers && isUpper) {
+        resultList.forEach {
+            if (it.pairNumber !in forAllPairNumbers && it.pairNumber !in upperNumbers)
+                tempList.add(it)
+        }
+
+        resultList = tempList
+
+        upperPair.forEach {
             resultList.add(it)
         }
     }

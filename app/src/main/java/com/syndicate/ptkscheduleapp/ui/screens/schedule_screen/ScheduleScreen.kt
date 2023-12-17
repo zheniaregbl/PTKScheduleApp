@@ -1,5 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -47,7 +48,6 @@ import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.ShowScheduleState
 import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
-import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
@@ -83,11 +83,9 @@ fun ScheduleScreen(
     val scheduleWithReplacement = applyReplacementSchedule(scheduleList.value, replacement.value)
     val replacementPairNumbers = fillListReplacementNumber(replacement.value)
 
-    val currentScheduleNullable = deleteEmptyLesson(scheduleWithReplacement)
-
-    val currentSchedule = if (currentScheduleNullable.isNullOrEmpty()) {
+    val currentSchedule = if (scheduleWithReplacement.isNullOrEmpty()) {
         emptyList()
-    } else currentScheduleNullable
+    } else scheduleWithReplacement
 
     val selectedDateState = remember {
         mutableStateOf(LocalDate.now())
@@ -224,8 +222,11 @@ fun ScheduleScreen(
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
                                     || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != item.pairNumber
-                                    || index != 0 && prevLessonNumber == item.pairNumber
+                                    /*|| index != 0 && prevLessonNumber == item.pairNumber*/
                                 ) {
+
+                                    val lessons = listSeveralLessons
+
                                     LessonCard(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -252,7 +253,7 @@ fun ScheduleScreen(
                                                     replacementDialogShow = true
 
                                                     mainLesson = list
-                                                    replacementLesson = listOf(item)
+                                                    replacementLesson = lessons
                                                 }
                                             },
                                         lessonList = listSeveralLessons,
@@ -333,6 +334,7 @@ fun ScheduleScreen(
             },
             weekType = isUpperWeek,
             changeSchedule = { dayOfWeek, typeWeek, date ->
+                Log.d("weekState", typeWeek.toString())
                 viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek, date))
             },
             hideCalendar = {
