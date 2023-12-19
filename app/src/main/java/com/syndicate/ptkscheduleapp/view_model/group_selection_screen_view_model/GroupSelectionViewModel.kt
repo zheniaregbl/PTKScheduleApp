@@ -9,6 +9,10 @@ import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.info_functions.getListGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +22,9 @@ class GroupSelectionViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
 ): ViewModel() {
 
+    val isListFill = MutableStateFlow(false)
     private var _listGroup = MutableLiveData<List<String>>()
+
     var listGroup: LiveData<List<String>> = _listGroup
 
     fun onEvent(event: GroupSelectionEvent) {
@@ -38,6 +44,10 @@ class GroupSelectionViewModel @Inject constructor(
             _listGroup.postValue(
                 getListGroup(groupJson)
             )
+
+            delay(500)
+
+            isListFill.update { true }
         }
     }
 }

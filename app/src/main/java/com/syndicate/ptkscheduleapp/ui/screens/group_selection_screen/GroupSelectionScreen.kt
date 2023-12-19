@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -46,11 +47,9 @@ import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.component
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.GroupPicker
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.rememberPickerState
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
-import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionEvent
 import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun GroupSelectionScreen(
@@ -65,6 +64,7 @@ fun GroupSelectionScreen(
 
     val viewModel = hiltViewModel<GroupSelectionViewModel>()
     val listGroup = viewModel.listGroup.observeAsState()
+    val isListFill by viewModel.isListFill.collectAsState()
 
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(resId = R.raw.loading_lottie2)
@@ -86,7 +86,6 @@ fun GroupSelectionScreen(
     )
 
     LaunchedEffect(Unit) {
-        delay(200)
         viewModel.onEvent(GroupSelectionEvent.FillListGroup)
     }
 
@@ -159,7 +158,7 @@ fun GroupSelectionScreen(
                             horizontal = 82.dp,
                             vertical = 18.dp
                         ),
-                    enable = !isLoading && !groups.isNullOrEmpty(),
+                    enable = !isLoading && isListFill,
                     onClick = {
 
                         if (isNetworkAvailable(context)) {

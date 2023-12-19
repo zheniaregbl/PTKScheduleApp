@@ -48,7 +48,7 @@ fun SettingItem(
             .clickable {
                 onClick()
             }
-            .padding(6.dp)
+            .padding(10.dp)
             .composed { modifier },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically

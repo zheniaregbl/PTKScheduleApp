@@ -90,11 +90,6 @@ fun SettingScreen(
                             sizeImage = 30.dp,
                             onClick = navigateToTheme
                         )
-
-                        Spacer(
-                            modifier = Modifier
-                                .height(20.dp)
-                        )
                     }
                 }
 

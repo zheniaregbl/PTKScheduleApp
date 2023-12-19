@@ -50,10 +50,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.SplashScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(800))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             SplashScreen(
@@ -83,10 +83,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.RoleSelectionScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             RoleSelectionScreen(
@@ -109,10 +109,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.CourseSelectionScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             CourseSelectionScreen(
@@ -130,10 +130,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.GroupSelectionScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             GroupSelectionScreen(
@@ -171,7 +171,7 @@ fun AppNavigation(
                 fadeIn(animationSpec = tween(800))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             ScheduleScreen(
@@ -194,10 +194,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.SettingScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             SettingScreen(
@@ -220,10 +220,10 @@ fun AppNavigation(
         composable(
             route = ScreenRoute.ThemeScreen.route,
             enterTransition = {
-                fadeIn(animationSpec = tween(400))
+                fadeIn(animationSpec = tween(200))
             },
             exitTransition = {
-                fadeOut(animationSpec = tween(400))
+                fadeOut(animationSpec = tween(200))
             }
         ) {
             ThemeScreen(
