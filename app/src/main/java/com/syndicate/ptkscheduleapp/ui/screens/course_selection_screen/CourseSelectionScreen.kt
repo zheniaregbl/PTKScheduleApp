@@ -17,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SelectionCourseSection
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
-import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
 
 @Composable
 fun CourseSelectionScreen(

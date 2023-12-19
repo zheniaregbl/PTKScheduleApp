@@ -1,6 +1,5 @@
 package com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model
 
-import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainEvent
 import java.time.DayOfWeek
 import java.time.LocalDate
 

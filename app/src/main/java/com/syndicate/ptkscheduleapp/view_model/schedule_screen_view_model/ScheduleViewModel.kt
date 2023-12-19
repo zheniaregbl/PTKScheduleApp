@@ -1,7 +1,6 @@
 package com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

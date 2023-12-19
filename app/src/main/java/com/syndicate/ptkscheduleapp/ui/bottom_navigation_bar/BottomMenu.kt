@@ -20,8 +20,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +36,6 @@ import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.navigation.ScreenRoute
 import com.syndicate.ptkscheduleapp.ui.theme.ActiveNavItemColor
 import com.syndicate.ptkscheduleapp.ui.theme.InactiveNavItemColor
-import kotlinx.coroutines.delay
 
 @Composable
 fun BottomMenu(

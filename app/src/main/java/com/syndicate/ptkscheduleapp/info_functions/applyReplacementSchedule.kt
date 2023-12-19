@@ -1,6 +1,5 @@
 package com.syndicate.ptkscheduleapp.info_functions
 
-import android.util.Log
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 
 fun applyReplacementSchedule(
