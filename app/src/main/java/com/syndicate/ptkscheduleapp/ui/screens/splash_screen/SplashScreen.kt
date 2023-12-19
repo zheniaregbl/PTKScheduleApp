@@ -37,7 +37,7 @@ fun SplashScreen(
     modifier: Modifier = Modifier,
     isFirstStart: Boolean = true,
     userThemeMode: ThemeMode = ThemeMode.FIRST,
-    navigateToRole: () -> Unit = { },
+    navigateToCourse: () -> Unit = { },
     navigateToSchedule: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
@@ -69,7 +69,7 @@ fun SplashScreen(
 
             delay(1000L)
 
-            if (isFirstStart) navigateToRole() else navigateToSchedule()
+            if (isFirstStart) navigateToCourse() else navigateToSchedule()
         }
     }
 

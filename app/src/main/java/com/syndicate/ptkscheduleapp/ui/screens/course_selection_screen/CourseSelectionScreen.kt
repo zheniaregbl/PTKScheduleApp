@@ -1,5 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SelectionCourseSection
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
@@ -30,6 +33,9 @@ fun CourseSelectionScreen(
     modifier: Modifier = Modifier,
     navigateToNext: (Int) -> Unit = { }
 ) {
+
+    val context = LocalContext.current
+
     val radioOptions = listOf("1 курс", "2 курс", "3 курс", "4 курс")
     val radioState = rememberSaveable {
         mutableIntStateOf(1)
@@ -88,7 +94,14 @@ fun CourseSelectionScreen(
                             vertical = 18.dp
                         ),
                     onClick = {
-                        navigateToNext(radioState.intValue)
+                        if (isNetworkAvailable(context))
+                            navigateToNext(radioState.intValue)
+                        else
+                            Toast.makeText(
+                                context,
+                                "Нет интернет соединения",
+                                Toast.LENGTH_LONG
+                            ).show()
                     },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,

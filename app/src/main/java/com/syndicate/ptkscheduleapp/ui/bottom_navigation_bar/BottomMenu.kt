@@ -1,13 +1,10 @@
 package com.syndicate.ptkscheduleapp.ui.bottom_navigation_bar
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -51,21 +50,9 @@ fun BottomMenu(
     isDarkTheme: Boolean = false
 ) {
 
-    var transition by remember {
-        mutableStateOf(true)
-    }
-
     LaunchedEffect(currentRoute) {
         if (currentRoute == ScreenRoute.ScheduleScreen.route)
             selectedItemIndex.value = 0
-    }
-
-    LaunchedEffect(transition) {
-        if (!transition) {
-            delay(200)
-
-            transition = true
-        }
     }
 
     val items = listOf(
@@ -96,44 +83,35 @@ fun BottomMenu(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            AnimatedContent(
-                targetState = selectedItemIndex.value,
-                label = "",
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(durationMillis = 400)) togetherWith
-                            fadeOut(animationSpec = tween(durationMillis = 400))
-                }
-            ) { itemIndex ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    items.forEachIndexed { index, bottomNavItem ->
-                        BottomMenuItem(
-                            item = bottomNavItem,
-                            isDarkTheme = isDarkTheme,
-                            isSelected = itemIndex == index,
-                            onClick = { navItem ->
-                                if (itemIndex != index && transition) {
-                                    selectedItemIndex.value = index
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items.forEachIndexed { index, bottomNavItem ->
 
+                    BottomMenuItem(
+                        item = bottomNavItem,
+                        isDarkTheme = isDarkTheme,
+                        isSelected = selectedItemIndex.value == index,
+                        onClick = { navItem ->
+                            if (selectedItemIndex.value != index) {
 
-                                    if (bottomNavItem.name == "setting")
-                                        panelState.value = PanelState.WeekPanel
+                                selectedItemIndex.value = index
 
-                                    navController.navigate(navItem.route) {
-                                        popUpTo(0)
-                                    }
+                                if (bottomNavItem.name == "setting")
+                                    panelState.value = PanelState.WeekPanel
 
-                                    transition = false
+                                navController.navigate(navItem.route) {
+                                    popUpTo(0)
                                 }
                             }
+                        }
+                    )
+
+                    if (index != items.lastIndex)
+                        Spacer(
+                            modifier = Modifier
+                                .width(100.dp)
                         )
-                        if (index != items.lastIndex)
-                            Spacer(
-                                modifier = Modifier
-                                    .width(100.dp)
-                            )
-                    }
                 }
             }
         }
@@ -147,15 +125,19 @@ fun BottomMenuItem(
     isSelected: Boolean = false,
     onClick: (BottomNavItem) -> Unit
 ) {
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (isSelected) if (isDarkTheme) InactiveNavItemColor else ActiveNavItemColor
+        else if (isDarkTheme) ActiveNavItemColor else InactiveNavItemColor,
+        label = "",
+        animationSpec = tween(200, easing = LinearEasing)
+    )
+
     Box(
         modifier = Modifier
             .size(60.dp)
-            .clickable(
-                indication = null,
-                interactionSource = remember {
-                    MutableInteractionSource()
-                }
-            ) { onClick(item) },
+            .clip(CircleShape)
+            .clickable { onClick(item) },
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -163,8 +145,7 @@ fun BottomMenuItem(
                 .size(35.dp),
             imageVector = item.icon,
             contentDescription = null,
-            tint = if (isSelected) if (isDarkTheme) InactiveNavItemColor else ActiveNavItemColor
-            else if (isDarkTheme) ActiveNavItemColor else InactiveNavItemColor
+            tint = buttonColor
         )
     }
 }

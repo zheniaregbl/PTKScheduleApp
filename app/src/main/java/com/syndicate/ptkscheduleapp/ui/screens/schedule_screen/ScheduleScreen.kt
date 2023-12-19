@@ -11,6 +11,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +52,7 @@ import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.ShowScheduleState
 import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
+import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
@@ -58,6 +63,7 @@ import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.Network
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Composable
@@ -83,9 +89,11 @@ fun ScheduleScreen(
     val scheduleWithReplacement = applyReplacementSchedule(scheduleList.value, replacement.value)
     val replacementPairNumbers = fillListReplacementNumber(replacement.value)
 
-    val currentSchedule = if (scheduleWithReplacement.isNullOrEmpty()) {
+    val scheduleNullable = deleteEmptyLesson(scheduleWithReplacement)
+
+    val currentSchedule = if (scheduleNullable.isNullOrEmpty()) {
         emptyList()
-    } else scheduleWithReplacement
+    } else scheduleNullable
 
     val selectedDateState = remember {
         mutableStateOf(LocalDate.now())
@@ -110,7 +118,13 @@ fun ScheduleScreen(
 
     LaunchedEffect(Unit) {
         delay(300)
-        viewModel.onEvent(ScheduleEvent.ChangeSchedule(LocalDate.now().dayOfWeek, isUpperWeek, selectedDateState.value))
+        viewModel.onEvent(
+            ScheduleEvent.ChangeSchedule(
+                LocalDate.now().dayOfWeek,
+                isUpperWeek,
+                selectedDateState.value
+            )
+        )
 
         showScheduleState = ShowScheduleState.SHOW
 
@@ -123,7 +137,7 @@ fun ScheduleScreen(
 
     Box(
         modifier = Modifier
-            .pointerInput(Unit) {
+            .pointerInput(panelState.value != PanelState.CalendarPanel) {
                 detectTapGestures {
                     if (panelState.value == PanelState.CalendarPanel)
                         panelState.value = PanelState.WeekPanel
@@ -191,11 +205,20 @@ fun ScheduleScreen(
                                             shape = RoundedCornerShape(10.dp)
                                         )
                                         .clickable {
-                                            if (item.pairNumber in replacementPairNumbers) {
-                                                replacementDialogShow = true
+                                            if (panelState.value == PanelState.WeekPanel) {
 
-                                                mainLesson = list
-                                                replacementLesson = listOf(item)
+                                                if (item.pairNumber in replacementPairNumbers) {
+                                                    replacementDialogShow = true
+
+                                                    mainLesson = list
+                                                    replacementLesson = listOf(item)
+                                                }
+                                            } else {
+                                                Log.d(
+                                                    "checkPanelState",
+                                                    panelState.value.toString()
+                                                )
+                                                panelState.value = PanelState.WeekPanel
                                             }
                                         },
                                     lessonItem = item,
@@ -222,7 +245,7 @@ fun ScheduleScreen(
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
                                     || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != item.pairNumber
-                                    /*|| index != 0 && prevLessonNumber == item.pairNumber*/
+                                /*|| index != 0 && prevLessonNumber == item.pairNumber*/
                                 ) {
 
                                     val lessons = listSeveralLessons
@@ -249,11 +272,20 @@ fun ScheduleScreen(
                                                 shape = RoundedCornerShape(10.dp)
                                             )
                                             .clickable {
-                                                if (item.pairNumber in replacementPairNumbers) {
-                                                    replacementDialogShow = true
+                                                if (panelState.value == PanelState.WeekPanel) {
 
-                                                    mainLesson = list
-                                                    replacementLesson = lessons
+                                                    if (item.pairNumber in replacementPairNumbers) {
+                                                        replacementDialogShow = true
+
+                                                        mainLesson = list
+                                                        replacementLesson = lessons
+                                                    }
+                                                } else {
+                                                    Log.d(
+                                                        "checkPanelState",
+                                                        panelState.value.toString()
+                                                    )
+                                                    panelState.value = PanelState.WeekPanel
                                                 }
                                             },
                                         lessonList = listSeveralLessons,

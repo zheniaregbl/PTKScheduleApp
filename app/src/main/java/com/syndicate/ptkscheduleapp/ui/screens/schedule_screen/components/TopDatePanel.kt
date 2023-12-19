@@ -1,6 +1,7 @@
 package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -67,16 +68,17 @@ fun TopDatePanel(
     selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
     updateReplacement: (LocalDate) -> Unit = { },
     weekType: Boolean = true,
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit = {
-        _: DayOfWeek, _: Boolean, _: LocalDate ->
+    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit = { _: DayOfWeek, _: Boolean, _: LocalDate ->
     },
     hideCalendar: () -> Unit = { },
     isDarkTheme: Boolean = false
 ) {
+
     val weeks = getWeeksFromStartDate(
         LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
         78
     )
+
     val initWeekNumber = getCurrentWeek(weeks, LocalDate.now())
     val months = getMonthsFromWeeks(weeks)
 
@@ -159,14 +161,14 @@ fun TopDatePanel(
                     drawLine(
                         color = colorBorder,
                         start = Offset(x = 0.dp.toPx(), y = 0.dp.toPx()),
-                        end = Offset(x = 0.dp.toPx(), y = size.height),
+                        end = Offset(x = 0.dp.toPx(), y = size.height - 25.dp.toPx()),
                         strokeWidth = 4.dp.toPx()
                     )
 
                     drawLine(
                         color = colorBorder,
-                        start = Offset(x = size.width - 1.dp.toPx(), y = 0.dp.toPx()),
-                        end = Offset(x = size.width - 1.dp.toPx(), y = size.height),
+                        start = Offset(x = size.width, y = 0.dp.toPx()),
+                        end = Offset(x = size.width, y = size.height - 25.dp.toPx()),
                         strokeWidth = 4.dp.toPx()
                     )
 
@@ -277,7 +279,7 @@ fun TopDatePanel(
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
-                                        else GrayThirdTheme
+                                else GrayThirdTheme
                             )
                         }
                     }
@@ -353,11 +355,19 @@ fun WeekPanel(
     changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit,
     isDarkTheme: Boolean = false
 ) {
-    pagerWeekStateSaved.value = syncPanels(
+    /*pagerWeekStateSaved.value = syncPanels(
         weeks,
         monthValue.value,
         yearText.value,
         selectedDate.value
+    )*/
+
+    pagerWeekStateSaved.value = syncWeekPanel(
+        weeks,
+        monthValue.value,
+        yearText.value,
+        selectedDate.value,
+        pagerWeekStateSaved.value
     )
 
     val pagerState = rememberPagerState(
@@ -372,25 +382,37 @@ fun WeekPanel(
 
             val weekDates = weeks[page]
 
-            monthText.value = when (weekDates[3].month) {
-                Month.JANUARY -> "Январь"
-                Month.FEBRUARY -> "Февраль"
-                Month.MARCH -> "Март"
-                Month.APRIL -> "Апрель"
-                Month.MAY -> "Май"
-                Month.JUNE -> "Июнь"
-                Month.JULY -> "Июль"
-                Month.AUGUST -> "Август"
-                Month.SEPTEMBER -> "Сентябрь"
-                Month.OCTOBER -> "Октябрь"
-                Month.NOVEMBER -> "Ноябрь"
-                Month.DECEMBER -> "Декабрь"
-                else -> "Январь"
+            if (selectedDate.value !in weekDates) {
+
+                monthText.value = getStringByMonth(weekDates[3].month)
+                monthValue.value = weekDates[3].month
+                yearText.value = weekDates[3].year
+            } else {
+
+                monthText.value = getStringByMonth(selectedDate.value.month)
+                monthValue.value = selectedDate.value.month
+                yearText.value = selectedDate.value.year
             }
+        }
+    }
 
-            monthValue.value = weekDates[3].month
+    LaunchedEffect(key1 = selectedDate.value) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            pagerWeekStateSaved.value = page
 
-            yearText.value = weekDates[3].year
+            val weekDates = weeks[page]
+
+            if (selectedDate.value !in weekDates) {
+
+                monthText.value = getStringByMonth(weekDates[3].month)
+                monthValue.value = weekDates[3].month
+                yearText.value = weekDates[3].year
+            } else {
+
+                monthText.value = getStringByMonth(selectedDate.value.month)
+                monthValue.value = selectedDate.value.month
+                yearText.value = selectedDate.value.year
+            }
         }
     }
 
@@ -445,7 +467,7 @@ fun WeekPanel(
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
                             color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
-                                else GrayThirdTheme
+                            else GrayThirdTheme
                         )
                     }
                 }
@@ -629,6 +651,7 @@ fun DayItem(
                 .size(36.dp)
                 .clip(CircleShape)
                 .clickable {
+
                     changeSchedule(
                         value.dayOfWeek,
                         getCurrentTypeWeek(
@@ -657,7 +680,7 @@ fun DayItem(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = if (isDarkTheme) Color.White.copy(alpha = 0.6f)
-                    else GrayThirdTheme
+                else GrayThirdTheme
             )
         }
     else
@@ -675,6 +698,22 @@ fun DayItem(
                 color = GrayThirdTheme
             )
         }
+}
+
+private fun getStringByMonth(month: Month) = when (month) {
+    Month.JANUARY -> "Январь"
+    Month.FEBRUARY -> "Февраль"
+    Month.MARCH -> "Март"
+    Month.APRIL -> "Апрель"
+    Month.MAY -> "Май"
+    Month.JUNE -> "Июнь"
+    Month.JULY -> "Июль"
+    Month.AUGUST -> "Август"
+    Month.SEPTEMBER -> "Сентябрь"
+    Month.OCTOBER -> "Октябрь"
+    Month.NOVEMBER -> "Ноябрь"
+    Month.DECEMBER -> "Декабрь"
+    else -> "Январь"
 }
 
 private fun getWeeksFromStartDate(
@@ -777,6 +816,7 @@ private fun getMonthsFromWeeks(weeks: List<List<LocalDate>>): List<List<LocalDat
                 if (arrayDaysOfMonth.size in 28..31) {
 
                     arrayOfMonths.add(arrayDaysOfMonth)
+
                     arrayDaysOfMonth = ArrayList()
 
                     currentMonth = currentMonth.plus(1)
@@ -786,6 +826,19 @@ private fun getMonthsFromWeeks(weeks: List<List<LocalDate>>): List<List<LocalDat
             }
         }
     }
+
+    if (arrayDaysOfMonth.size != 0) {
+
+        var day = arrayDaysOfMonth.last().plusDays(1)
+
+        while (day.month == currentMonth) {
+
+            arrayDaysOfMonth.add(day)
+            day = day.plusDays(1)
+        }
+    }
+
+    arrayOfMonths.add(arrayDaysOfMonth)
 
     return arrayOfMonths
 }
@@ -803,6 +856,9 @@ private fun syncPanels(
     year: Int = LocalDate.now().year,
     selectedDate: LocalDate
 ): Int {
+
+    Log.d("syncPanel", content.size.toString())
+
     if (selectedDate.month == month && selectedDate.year == year) {
 
         for (i in content.indices) {
@@ -810,7 +866,8 @@ private fun syncPanels(
             for (j in content[i].indices)
                 if (content[i][j].dayOfMonth == selectedDate.dayOfMonth
                     && content[i][j].month == selectedDate.month
-                    && content[i][j].year == selectedDate.year)
+                    && content[i][j].year == selectedDate.year
+                )
                     return i
         }
 
@@ -820,6 +877,54 @@ private fun syncPanels(
             if (content[i].first().month == month && content[i].first().year == year)
                 return i
         }
+    }
+
+    return 0
+}
+
+private fun syncWeekPanel(
+    content: List<List<LocalDate>>,
+    month: Month,
+    year: Int = LocalDate.now().year,
+    selectedDate: LocalDate,
+    pagerWeekState: Int
+): Int {
+
+    if (selectedDate.month == month && selectedDate.year == year) {
+        return returnToSelectedDate(content, selectedDate)
+    } else {
+
+        if (content[pagerWeekState].first().month == month &&
+            content[pagerWeekState].last().month == month ||
+            content[pagerWeekState][3].month == month) {
+
+            return pagerWeekState
+        } else {
+
+            for (i in content.indices) {
+
+                if (content[i].first().month == month && content[i].first().year == year)
+                    return i
+            }
+        }
+    }
+
+    return 0
+}
+
+private fun returnToSelectedDate(
+    content: List<List<LocalDate>>,
+    selectedDate: LocalDate
+): Int {
+
+    for (i in content.indices) {
+
+        for (j in content[i].indices)
+            if (content[i][j].dayOfMonth == selectedDate.dayOfMonth
+                && content[i][j].month == selectedDate.month
+                && content[i][j].year == selectedDate.year
+            )
+                return i
     }
 
     return 0

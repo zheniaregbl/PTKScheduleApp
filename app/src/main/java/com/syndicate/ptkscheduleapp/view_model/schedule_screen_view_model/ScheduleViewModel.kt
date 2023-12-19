@@ -87,8 +87,6 @@ class ScheduleViewModel @Inject constructor(
             DayOfWeek.SUNDAY -> emptyList()
         }
 
-        Log.d("listSchedule", daySchedule?.joinToString() ?: "")
-
         _currentSchedule.postValue(
             filterSchedule(daySchedule, isUpperWeek)
         )

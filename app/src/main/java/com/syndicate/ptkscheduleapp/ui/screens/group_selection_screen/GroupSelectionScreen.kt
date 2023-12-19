@@ -1,5 +1,6 @@
 package com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,10 +41,13 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.UserMode
+import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
 import com.syndicate.ptkscheduleapp.ui.screens.course_selection_screen.components.SimpleButton
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.GroupPicker
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.rememberPickerState
+import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
+import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionEvent
 import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionViewModel
 import kotlinx.coroutines.delay
@@ -52,8 +57,12 @@ fun GroupSelectionScreen(
     modifier: Modifier = Modifier,
     navigateToNext: () -> Unit = { },
     changeUserGroup: (String) -> Unit = { },
-    userMode: UserMode = UserMode.Student
+    userMode: UserMode = UserMode.Student,
+    isDarkTheme: Boolean = false
 ) {
+
+    val context = LocalContext.current
+
     val viewModel = hiltViewModel<GroupSelectionViewModel>()
     val listGroup = viewModel.listGroup.observeAsState()
 
@@ -77,8 +86,8 @@ fun GroupSelectionScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.onEvent(GroupSelectionEvent.FillListGroup)
         delay(200)
+        viewModel.onEvent(GroupSelectionEvent.FillListGroup)
     }
 
     Box(
@@ -144,7 +153,7 @@ fun GroupSelectionScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(10.dp))
                         .background(
-                            color = SecondThemeBackground
+                            color = MaterialTheme.colorScheme.inversePrimary
                         )
                         .padding(
                             horizontal = 82.dp,
@@ -152,13 +161,23 @@ fun GroupSelectionScreen(
                         ),
                     enable = !isLoading && !groups.isNullOrEmpty(),
                     onClick = {
-                        isLoading = !isLoading
-                        changeUserGroup(valuesPickerState.selectedItem)
-                        navigateToNext()
+
+                        if (isNetworkAvailable(context)) {
+
+                            isLoading = !isLoading
+                            changeUserGroup(valuesPickerState.selectedItem)
+                            navigateToNext()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Нет интернет соединения",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Normal,
-                    textColor = Color.Black
+                    textColor = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -179,7 +198,7 @@ fun GroupSelectionScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .background(
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = if (isDarkTheme) ThirdThemeBackground else FirstThemeBackground
                         )
                         .padding(
                             16.dp

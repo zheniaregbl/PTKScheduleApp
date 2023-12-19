@@ -64,8 +64,8 @@ fun AppNavigation(
                         top = 10.dp
                     ),
                 isFirstStart = state.isFirstStart,
-                navigateToRole = {
-                    navController.navigate(ScreenRoute.RoleSelectionScreen.route) {
+                navigateToCourse = {
+                    navController.navigate(ScreenRoute.CourseSelectionScreen.route) {
                         popUpTo(0)
                     }
                 },
@@ -157,7 +157,11 @@ fun AppNavigation(
                 changeUserGroup = { group ->
                     viewModel.onEvent(MainEvent.ChangeUserGroup(group))
                 },
-                userMode = state.userMode
+                userMode = state.userMode,
+                isDarkTheme = when (state.colorThemeMode) {
+                    ThemeMode.FIRST, ThemeMode.SECOND -> false
+                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                }
             )
         }
 
