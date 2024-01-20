@@ -93,11 +93,13 @@ fun AppNavGraph(
                 }
         }
     ) { paddingValues ->
+
         Surface(
             modifier = Modifier
                 .fillMaxSize(),
             color = backgroundColor
         ) {
+
             AppNavigation(
                 navController = navController,
                 state = state,

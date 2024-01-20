@@ -1,5 +1,8 @@
 package com.syndicate.ptkscheduleapp.data.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class LessonItem(
     val time: String = "8.30-10.10",
     val lessonTitle: String = "Математика",

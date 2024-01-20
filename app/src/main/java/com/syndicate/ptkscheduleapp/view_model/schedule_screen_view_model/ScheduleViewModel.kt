@@ -8,9 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.ScheduleState
 import com.syndicate.ptkscheduleapp.info_functions.filterSchedule
-import com.syndicate.ptkscheduleapp.info_functions.getReplacementFromJson
+import com.syndicate.ptkscheduleapp.info_functions.getReplacementFromJsonByDay
 import com.syndicate.ptkscheduleapp.info_functions.getScheduleFromJson
-import com.syndicate.ptkscheduleapp.info_functions.getStartDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +29,10 @@ class ScheduleViewModel @Inject constructor(
     private val _state = MutableStateFlow(ScheduleState())
     private val _scheduleList = MutableLiveData<List<List<LessonItem>>>()
     private val _currentSchedule = MutableLiveData<List<LessonItem>>()
-    private val _replacement = MutableLiveData<List<List<List<LessonItem>>>>()
     private val _dayReplacement = MutableLiveData<List<LessonItem>>()
+
+    // For pager on schedule screen (not use now)
+    private val _filterWeekSchedule = MutableLiveData<List<List<LessonItem>>>()
 
     var currentSchedule: LiveData<List<LessonItem>> = _currentSchedule
     var dayReplacement: LiveData<List<LessonItem>> = _dayReplacement
@@ -41,7 +42,6 @@ class ScheduleViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             getCurrentSchedule(_state.value.dayOfWeek, _state.value.isUpperWeek)
         }
-        getReplacement()
     }
 
     fun onEvent(event: ScheduleEvent) {
@@ -49,11 +49,7 @@ class ScheduleViewModel @Inject constructor(
 
             is ScheduleEvent.ChangeSchedule -> {
                 getCurrentSchedule(event.dayOfWeek, event.isUpperWeek)
-                getCurrentReplacement(event.selectedDate, event.dayOfWeek)
-            }
-
-            is ScheduleEvent.GetReplacement -> {
-                getCurrentReplacement(event.selectedDate, event.selectedDate.dayOfWeek)
+                getCurrentReplacementRework(event.selectedDate)
             }
         }
     }
@@ -76,6 +72,16 @@ class ScheduleViewModel @Inject constructor(
         dayOfWeek: DayOfWeek,
         isUpperWeek: Boolean
     ) {
+
+        /*if (!_scheduleList.value.isNullOrEmpty()) {
+
+            Log.d("checkSizeWeeks", "size:" + _scheduleList.value!!.size.toString())
+
+            for (list in _scheduleList.value!!) {
+                Log.d("checkSizeWeeks", list.size.toString())
+            }
+        }*/
+
         val daySchedule = when (dayOfWeek) {
             DayOfWeek.MONDAY -> _scheduleList.value?.get(0)
             DayOfWeek.TUESDAY -> _scheduleList.value?.get(1)
@@ -91,63 +97,43 @@ class ScheduleViewModel @Inject constructor(
         )
     }
 
-    private fun getCurrentReplacement(
-        selectedDate: LocalDate,
-        dayOfWeek: DayOfWeek
+    // For pager on schedule screen (not use now)
+    private fun getCurrentSchedule(
+        isUpperWeek: Boolean
     ) {
 
-        val startDate = getStartDate(LocalDate.now(), 2)
+        val listLessons = ArrayList<List<LessonItem>>()
 
-        val weekList = when {
-            _replacement.value.isNullOrEmpty() -> emptyList()
-            selectedDate <= startDate.plusWeeks(1) .minusDays(1) && selectedDate >= startDate -> _replacement.value?.get(0)
-            selectedDate <= startDate.plusWeeks(2).minusDays(1) && selectedDate >= startDate.plusWeeks(1) -> _replacement.value?.get(1)
-            selectedDate <= startDate.plusWeeks(3).minusDays(1) && selectedDate >= startDate.plusWeeks(2) -> _replacement.value?.get(2)
-            else -> emptyList()
+        for (i in 0..6) {
+
+            val daySchedule = if (!_scheduleList.value?.get(i).isNullOrEmpty()) _scheduleList.value?.get(i)
+                else emptyList()
+
+            listLessons.add(filterSchedule(daySchedule, isUpperWeek))
         }
 
-        val dayReplacement = when (dayOfWeek) {
-            DayOfWeek.MONDAY -> if (weekList.isNullOrEmpty()) emptyList() else weekList[0]
-            DayOfWeek.TUESDAY -> if (weekList.isNullOrEmpty()) emptyList() else {
-                if (weekList.size < 2) emptyList() else weekList[1]
-            }
-            DayOfWeek.WEDNESDAY -> if (weekList.isNullOrEmpty()) emptyList() else {
-                if (weekList.size < 3) emptyList() else weekList[2]
-            }
-            DayOfWeek.THURSDAY -> if (weekList.isNullOrEmpty()) emptyList() else {
-                if (weekList.size < 4) emptyList() else weekList[3]
-            }
-            DayOfWeek.FRIDAY -> if (weekList.isNullOrEmpty()) emptyList() else {
-                if (weekList.size < 5) emptyList() else weekList[4]
-            }
-            DayOfWeek.SATURDAY -> if (weekList.isNullOrEmpty()) emptyList() else {
-                if (weekList.size < 6) emptyList() else weekList[5]
-            }
-            DayOfWeek.SUNDAY -> emptyList()
-        }
-
-        _dayReplacement.postValue(
-            dayReplacement.ifEmpty { emptyList() }
+        _filterWeekSchedule.postValue(
+            listLessons
         )
     }
 
-    private fun getReplacement() {
+    private fun getCurrentReplacementRework(
+        selectedDate: LocalDate
+    ) {
+
         viewModelScope.launch(Dispatchers.IO) {
 
             val stringJsonObject = sharedPreferences.getString("replacement", "")
 
             val replacementJson = if (stringJsonObject.isNullOrEmpty()) JSONObject()
-                            else JSONObject(stringJsonObject)
+            else JSONObject(stringJsonObject)
 
-            val replacement = getReplacementFromJson(
-                LocalDate.now(),
-                2,
-                replacementJson,
-                sharedPreferences.getString("user_group", "1991")!!
-            )
-
-            _replacement.postValue(
-                replacement
+            _dayReplacement.postValue(
+                getReplacementFromJsonByDay(
+                    selectedDate,
+                    replacementJson,
+                    sharedPreferences.getString("user_group", "1991")!!
+                )
             )
         }
     }

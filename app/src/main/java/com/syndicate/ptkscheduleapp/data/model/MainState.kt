@@ -1,7 +1,9 @@
 package com.syndicate.ptkscheduleapp.data.model
 
+import androidx.compose.runtime.Stable
 import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
 
+@Stable
 data class MainState(
     val colorThemeMode: ThemeMode = ThemeMode.FIRST,
     val isUpperWeek: Boolean = true,

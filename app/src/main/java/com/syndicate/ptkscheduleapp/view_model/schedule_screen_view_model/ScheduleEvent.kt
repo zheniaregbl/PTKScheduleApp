@@ -10,8 +10,4 @@ sealed interface ScheduleEvent {
         val isUpperWeek: Boolean,
         val selectedDate: LocalDate
     ): ScheduleEvent
-
-    data class GetReplacement(
-        val selectedDate: LocalDate
-    ): ScheduleEvent
 }

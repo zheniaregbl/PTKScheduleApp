@@ -8,6 +8,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.EaseOutQuad
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -55,6 +58,7 @@ import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.SwipeDirection
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
+import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
@@ -66,10 +70,8 @@ fun TopDatePanel(
     modifier: Modifier = Modifier,
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
-    updateReplacement: (LocalDate) -> Unit = { },
     weekType: Boolean = true,
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit = { _: DayOfWeek, _: Boolean, _: LocalDate ->
-    },
+    change: (ScheduleEvent) -> Unit = { },
     hideCalendar: () -> Unit = { },
     isDarkTheme: Boolean = false
 ) {
@@ -130,12 +132,23 @@ fun TopDatePanel(
     val colorBorder = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
 
     Box(
-        modifier = Modifier
-            .background(
-                color = colorShadow
-            )
-            .composed { modifier }
+        modifier = modifier
     ) {
+
+        AnimatedVisibility(
+            visible = panelState.value == PanelState.CalendarPanel,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.Black.copy(alpha = 0.35f)
+                    )
+            )
+        }
 
         Box(
             modifier = Modifier
@@ -295,14 +308,13 @@ fun TopDatePanel(
                                 bottom = 12.dp
                             ),
                         selectedDate = selectedDateState,
-                        updateReplacement = updateReplacement,
                         weekType = weekType,
                         weeks = weeks,
                         monthValue = monthValue,
                         pagerWeekStateSaved = pagerWeekStateSaved,
                         monthText = monthText,
                         yearText = yearText,
-                        changeSchedule = changeSchedule,
+                        change = change,
                         isDarkTheme = isDarkTheme
                     )
                 }
@@ -321,7 +333,6 @@ fun TopDatePanel(
                                     bottom = 12.dp
                                 ),
                             selectedDate = selectedDateState,
-                            updateReplacement = updateReplacement,
                             weekType = weekType,
                             weekList = weeks,
                             months = months,
@@ -329,7 +340,7 @@ fun TopDatePanel(
                             pagerMonthStateSaved = pagerMonthStateSaved,
                             monthText = monthText,
                             yearText = yearText,
-                            changeSchedule = changeSchedule,
+                            change = change,
                             hideCalendar = hideCalendar,
                             isDarkTheme = isDarkTheme
                         )
@@ -345,14 +356,13 @@ fun TopDatePanel(
 fun WeekPanel(
     modifier: Modifier = Modifier,
     selectedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
-    updateReplacement: (LocalDate) -> Unit = { },
     weekType: Boolean,
     weeks: List<List<LocalDate>>,
     monthValue: MutableState<Month>,
     pagerWeekStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit,
+    change: (ScheduleEvent) -> Unit,
     isDarkTheme: Boolean = false
 ) {
     /*pagerWeekStateSaved.value = syncPanels(
@@ -442,17 +452,18 @@ fun WeekPanel(
                             .size(36.dp)
                             .clip(CircleShape)
                             .clickable {
-                                changeSchedule(
-                                    date.dayOfWeek,
-                                    getCurrentTypeWeek(
-                                        weekType,
-                                        getCurrentWeek(weeks, LocalDate.now()),
-                                        getCurrentWeek(weeks, date)
-                                    ),
-                                    date
+                                change(
+                                    ScheduleEvent.ChangeSchedule(
+                                        date.dayOfWeek,
+                                        getCurrentTypeWeek(
+                                            weekType,
+                                            getCurrentWeek(weeks, LocalDate.now()),
+                                            getCurrentWeek(weeks, date)
+                                        ),
+                                        date
+                                    )
                                 )
                                 selectedDate.value = date
-                                updateReplacement(date)
                             }
                             .border(
                                 width = 1.5.dp,
@@ -481,7 +492,6 @@ fun WeekPanel(
 fun Calendar(
     modifier: Modifier = Modifier,
     selectedDate: MutableState<LocalDate>,
-    updateReplacement: (LocalDate) -> Unit = { },
     weekType: Boolean,
     weekList: List<List<LocalDate>>,
     months: List<List<LocalDate>>,
@@ -489,7 +499,7 @@ fun Calendar(
     pagerMonthStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit,
+    change: (ScheduleEvent) -> Unit,
     hideCalendar: () -> Unit,
     isDarkTheme: Boolean = false
 ) {
@@ -563,8 +573,7 @@ fun Calendar(
                         weeks = weekList,
                         week = week,
                         selectedDate = selectedDate,
-                        updateReplacement = updateReplacement,
-                        changeSchedule = changeSchedule,
+                        change = change,
                         hideCalendar = hideCalendar,
                         isDarkTheme = isDarkTheme
                     )
@@ -581,8 +590,7 @@ fun WeekRow(
     weeks: List<List<LocalDate>>,
     week: List<LocalDate>,
     selectedDate: MutableState<LocalDate>,
-    updateReplacement: (LocalDate) -> Unit = { },
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit,
+    change: (ScheduleEvent) -> Unit,
     hideCalendar: () -> Unit,
     isDarkTheme: Boolean = false
 ) {
@@ -599,12 +607,11 @@ fun WeekRow(
 
                 DayItem(
                     selectedDate = selectedDate,
-                    updateReplacement = updateReplacement,
                     value = week[currentIndex],
                     isEmpty = false,
                     weekType = weekType,
                     weeks = weeks,
-                    changeSchedule = changeSchedule,
+                    change = change,
                     hideCalendar = hideCalendar,
                     isDarkTheme = isDarkTheme
                 )
@@ -615,12 +622,11 @@ fun WeekRow(
             } else {
                 DayItem(
                     selectedDate = selectedDate,
-                    updateReplacement = updateReplacement,
                     value = week[currentIndex],
                     isEmpty = true,
                     weekType = weekType,
                     weeks = weeks,
-                    changeSchedule = changeSchedule,
+                    change = change,
                     hideCalendar = hideCalendar,
                     isDarkTheme = isDarkTheme
                 )
@@ -635,12 +641,11 @@ fun WeekRow(
 @Composable
 fun DayItem(
     selectedDate: MutableState<LocalDate>,
-    updateReplacement: (LocalDate) -> Unit = { },
     value: LocalDate,
     isEmpty: Boolean,
     weekType: Boolean,
     weeks: List<List<LocalDate>>,
-    changeSchedule: (DayOfWeek, Boolean, LocalDate) -> Unit,
+    change: (ScheduleEvent) -> Unit,
     hideCalendar: () -> Unit,
     isDarkTheme: Boolean = false
 ) {
@@ -652,18 +657,19 @@ fun DayItem(
                 .clip(CircleShape)
                 .clickable {
 
-                    changeSchedule(
-                        value.dayOfWeek,
-                        getCurrentTypeWeek(
-                            weekType,
-                            getCurrentWeek(weeks, LocalDate.now()),
-                            getCurrentWeek(weeks, value)
-                        ),
-                        value
+                    change(
+                        ScheduleEvent.ChangeSchedule(
+                            value.dayOfWeek,
+                            getCurrentTypeWeek(
+                                weekType,
+                                getCurrentWeek(weeks, LocalDate.now()),
+                                getCurrentWeek(weeks, value)
+                            ),
+                            value
+                        )
                     )
 
                     selectedDate.value = value
-                    updateReplacement(value)
 
                     hideCalendar()
                 }

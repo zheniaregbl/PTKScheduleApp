@@ -356,14 +356,8 @@ fun ScheduleScreen(
                 .fillMaxSize(),
             panelState = panelState,
             selectedDateState = selectedDateState,
-            updateReplacement = { date ->
-                viewModel.onEvent(ScheduleEvent.GetReplacement(date))
-            },
             weekType = isUpperWeek,
-            changeSchedule = { dayOfWeek, typeWeek, date ->
-                Log.d("weekState", typeWeek.toString())
-                viewModel.onEvent(ScheduleEvent.ChangeSchedule(dayOfWeek, typeWeek, date))
-            },
+            change = viewModel::onEvent,
             hideCalendar = {
                 if (panelState.value == PanelState.CalendarPanel) {
                     panelState.value = PanelState.WeekPanel
