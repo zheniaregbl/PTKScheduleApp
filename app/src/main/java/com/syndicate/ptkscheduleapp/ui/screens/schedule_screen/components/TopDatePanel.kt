@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -56,6 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.SwipeDirection
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentTypeWeek
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentWeek
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getWeeksFromStartDate
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
@@ -71,22 +74,18 @@ fun TopDatePanel(
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
     selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
     weekType: Boolean = true,
+    weeks: List<List<LocalDate>> = getWeeksFromStartDate(
+        LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
+        78
+    ),
+    pagerWeekStateSaved: MutableState<Int> = mutableIntStateOf(0),
     change: (ScheduleEvent) -> Unit = { },
     hideCalendar: () -> Unit = { },
     isDarkTheme: Boolean = false
 ) {
 
-    val weeks = getWeeksFromStartDate(
-        LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
-        78
-    )
-
-    val initWeekNumber = getCurrentWeek(weeks, LocalDate.now())
     val months = getMonthsFromWeeks(weeks)
 
-    val pagerWeekStateSaved = remember {
-        mutableIntStateOf(initWeekNumber)
-    }
     val pagerMonthStateSaved = remember {
         mutableIntStateOf(getCurrentMonth(months, LocalDate.now()))
     }
@@ -94,13 +93,6 @@ fun TopDatePanel(
     var direction by remember {
         mutableStateOf(SwipeDirection.UP)
     }
-
-    val colorShadow by animateColorAsState(
-        targetValue = if (panelState.value == PanelState.CalendarPanel)
-            Color.Black.copy(alpha = 0.35f) else Color.Transparent,
-        animationSpec = tween(300, easing = LinearEasing),
-        label = ""
-    )
 
     val monthValue = remember {
         mutableStateOf(LocalDate.now().month)
@@ -365,26 +357,24 @@ fun WeekPanel(
     change: (ScheduleEvent) -> Unit,
     isDarkTheme: Boolean = false
 ) {
-    /*pagerWeekStateSaved.value = syncPanels(
-        weeks,
-        monthValue.value,
-        yearText.value,
-        selectedDate.value
-    )*/
 
-    pagerWeekStateSaved.value = syncWeekPanel(
-        weeks,
-        monthValue.value,
-        yearText.value,
-        selectedDate.value,
-        pagerWeekStateSaved.value
-    )
+    LaunchedEffect(Unit) {
+
+        pagerWeekStateSaved.value = syncPanelRework(
+            weeks,
+            selectedDate.value
+        )
+    }
 
     val pagerState = rememberPagerState(
         initialPage = pagerWeekStateSaved.value,
         initialPageOffsetFraction = 0f,
         pageCount = { weeks.size }
     )
+
+    LaunchedEffect(key1 = pagerWeekStateSaved.value) {
+        pagerState.scrollToPage(pagerWeekStateSaved.value)
+    }
 
     LaunchedEffect(key1 = pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -594,7 +584,7 @@ fun WeekRow(
     hideCalendar: () -> Unit,
     isDarkTheme: Boolean = false
 ) {
-    var currentDayOfWeek = DayOfWeek.MONDAY //DayOfWeek.SUNDAY
+    var currentDayOfWeek = DayOfWeek.MONDAY
     var currentIndex = 0
     var counterDays = 7
 
@@ -722,61 +712,7 @@ private fun getStringByMonth(month: Month) = when (month) {
     else -> "Январь"
 }
 
-private fun getWeeksFromStartDate(
-    startDate: LocalDate,
-    weeksCount: Int
-): List<List<LocalDate>> {
-    val weeks = mutableListOf<List<LocalDate>>()
-    var currentStartOfWeek = startDate
-
-    /*while (currentStartOfWeek.dayOfWeek != DayOfWeek.SUNDAY) {
-        currentStartOfWeek = currentStartOfWeek.minusDays(1)
-    }*/
-
-    while (currentStartOfWeek.dayOfWeek != DayOfWeek.MONDAY) {
-        currentStartOfWeek = currentStartOfWeek.minusDays(1)
-    }
-
-    repeat(weeksCount) {
-        val week = (0 until 7).map { currentStartOfWeek.plusDays(it.toLong()) }
-        weeks.add(week)
-        currentStartOfWeek = currentStartOfWeek.plusWeeks(1)
-    }
-
-    return weeks
-}
-
-private fun getCurrentTypeWeek(
-    typeWeekNow: Boolean,
-    prevPage: Int,
-    currentPage: Int
-) = if (prevPage % 2 == currentPage % 2) typeWeekNow else !typeWeekNow
-
-private fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
-    for (i in weeks.indices) {
-
-        for (j in weeks[i].indices) {
-
-            if (weeks[i][j].month == currentDate.month) {
-                weeks[i].forEach { day ->
-                    if (day.dayOfMonth == currentDate.dayOfMonth)
-                        return i
-                }
-            }
-        }
-        /*if (weeks[i][3].month == currentDate.month) {
-            weeks[i].forEach { day ->
-                if (day.dayOfMonth == currentDate.dayOfMonth)
-                    return i
-            }
-        }*/
-    }
-
-    return 0
-}
-
 private fun getWeeksFromMonth(month: List<LocalDate>): List<List<LocalDate>> {
-    // var currentDayOfWeek = DayOfWeek.SUNDAY
     var currentDayOfWeek = DayOfWeek.MONDAY
     var arrayDaysOfWeek = ArrayList<LocalDate>()
     val arrayWeeksOfMonth = ArrayList<List<LocalDate>>()
@@ -888,6 +824,20 @@ private fun syncPanels(
     return 0
 }
 
+private fun syncPanelRework(
+    content: List<List<LocalDate>>,
+    selectedDate: LocalDate
+): Int {
+
+    for (i in content.indices) {
+
+        if (content[i].indexOf(selectedDate) != -1)
+            return i
+    }
+
+    return 0
+}
+
 private fun syncWeekPanel(
     content: List<List<LocalDate>>,
     month: Month,
@@ -895,6 +845,8 @@ private fun syncWeekPanel(
     selectedDate: LocalDate,
     pagerWeekState: Int
 ): Int {
+
+    Log.d("syncWeekPanel", pagerWeekState.toString())
 
     if (selectedDate.month == month && selectedDate.year == year) {
         return returnToSelectedDate(content, selectedDate)

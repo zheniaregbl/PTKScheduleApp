@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
+import com.syndicate.ptkscheduleapp.data.model.ScheduleSwipeDirection
 import com.syndicate.ptkscheduleapp.data.model.ShowScheduleState
 import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
 import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
@@ -59,7 +63,12 @@ import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.Network
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
 import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Month
+import kotlin.math.abs
+
+private const val CONFIRM_SWIPE_VALUE = 250f
 
 @Composable
 fun ScheduleScreen(
@@ -75,6 +84,13 @@ fun ScheduleScreen(
 
     var showScheduleState by remember {
         mutableStateOf(ShowScheduleState.LOADING)
+    }
+
+    var swipeSum by remember {
+        mutableFloatStateOf(0f)
+    }
+    var swipeDirection by remember {
+        mutableStateOf(ScheduleSwipeDirection.NONE)
     }
 
     val viewModel = hiltViewModel<ScheduleViewModel>()
@@ -111,6 +127,15 @@ fun ScheduleScreen(
     var listSeveralLessons = ArrayList<LessonItem>()
     var prevLessonNumber = -1
 
+    val weeks = getWeeksFromStartDate(
+        LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
+        78
+    )
+    val initWeekNumber = getCurrentWeek(weeks, LocalDate.now())
+    val pagerWeekStateSaved = remember {
+        mutableIntStateOf(initWeekNumber)
+    }
+
     LaunchedEffect(Unit) {
         delay(300)
         viewModel.onEvent(
@@ -132,11 +157,128 @@ fun ScheduleScreen(
 
     Box(
         modifier = Modifier
-            .pointerInput(panelState.value != PanelState.CalendarPanel) {
+            .pointerInput(Unit) {
+
                 detectTapGestures {
+
                     if (panelState.value == PanelState.CalendarPanel)
                         panelState.value = PanelState.WeekPanel
                 }
+            }
+            .pointerInput(Unit) {
+
+                detectHorizontalDragGestures(
+
+                    onHorizontalDrag = { change, dragAmount ->
+
+                        if (panelState.value == PanelState.WeekPanel) {
+
+                            change.consume()
+
+                            when {
+
+                                swipeDirection == ScheduleSwipeDirection.NONE && dragAmount < 0 -> {
+
+                                    swipeDirection = ScheduleSwipeDirection.LEFT
+                                    Log.d("dragScheduleScreen", "start swipe to left")
+                                }
+
+                                swipeDirection == ScheduleSwipeDirection.NONE && dragAmount > 0 -> {
+
+                                    swipeDirection = ScheduleSwipeDirection.RIGHT
+                                    Log.d("dragScheduleScreen", "start swipe to right")
+                                }
+
+                                swipeDirection == ScheduleSwipeDirection.LEFT && dragAmount < 0 -> {
+
+                                    swipeSum += abs(dragAmount)
+                                }
+
+                                swipeDirection == ScheduleSwipeDirection.RIGHT && dragAmount > 0 -> {
+
+                                    swipeSum += abs(dragAmount)
+                                }
+                            }
+                        }
+                    },
+
+                    onDragEnd = {
+
+                        when {
+
+                            swipeSum >= CONFIRM_SWIPE_VALUE && swipeDirection == ScheduleSwipeDirection.LEFT -> {
+
+                                if (!(weeks[pagerWeekStateSaved.intValue].indexOf(selectedDateState.value) == 6 && pagerWeekStateSaved.intValue == weeks.size - 1)) {
+
+                                    if (
+                                        weeks[pagerWeekStateSaved.intValue].indexOf(
+                                            selectedDateState.value
+                                        ) == 6
+                                    )
+                                        pagerWeekStateSaved.intValue += 1
+
+                                    selectedDateState.value = selectedDateState.value.plusDays(1)
+
+                                    viewModel.onEvent(
+                                        ScheduleEvent.ChangeSchedule(
+                                            selectedDateState.value.dayOfWeek,
+                                            getCurrentTypeWeek(
+                                                isUpperWeek,
+                                                getCurrentWeek(
+                                                    weeks,
+                                                    LocalDate.now()
+                                                ),
+                                                getCurrentWeek(
+                                                    weeks,
+                                                    selectedDateState.value
+                                                )
+                                            ),
+                                            selectedDateState.value
+                                        )
+                                    )
+                                }
+                            }
+
+                            swipeSum >= CONFIRM_SWIPE_VALUE && swipeDirection == ScheduleSwipeDirection.RIGHT -> {
+
+                                if (!(weeks[pagerWeekStateSaved.intValue].indexOf(selectedDateState.value) == 0 && pagerWeekStateSaved.intValue == 0)) {
+
+                                    if (
+                                        weeks[pagerWeekStateSaved.intValue].indexOf(
+                                            selectedDateState.value
+                                        ) == 0
+                                    )
+                                        pagerWeekStateSaved.intValue -= 1
+
+                                    selectedDateState.value = selectedDateState.value.minusDays(1)
+
+                                    viewModel.onEvent(
+                                        ScheduleEvent.ChangeSchedule(
+                                            selectedDateState.value.dayOfWeek,
+                                            getCurrentTypeWeek(
+                                                isUpperWeek,
+                                                getCurrentWeek(
+                                                    weeks,
+                                                    LocalDate.now()
+                                                ),
+                                                getCurrentWeek(
+                                                    weeks,
+                                                    selectedDateState.value
+                                                )
+                                            ),
+                                            selectedDateState.value
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        Log.d("dragScheduleScreen", "end drag | $swipeSum")
+
+                        swipeDirection = ScheduleSwipeDirection.NONE
+                        swipeSum = 0f
+                    }
+                )
             }
             .composed { modifier }
     ) {
@@ -209,10 +351,6 @@ fun ScheduleScreen(
                                                     replacementLesson = listOf(item)
                                                 }
                                             } else {
-                                                Log.d(
-                                                    "checkPanelState",
-                                                    panelState.value.toString()
-                                                )
                                                 panelState.value = PanelState.WeekPanel
                                             }
                                         },
@@ -276,10 +414,6 @@ fun ScheduleScreen(
                                                         replacementLesson = lessons
                                                     }
                                                 } else {
-                                                    Log.d(
-                                                        "checkPanelState",
-                                                        panelState.value.toString()
-                                                    )
                                                     panelState.value = PanelState.WeekPanel
                                                 }
                                             },
@@ -317,7 +451,6 @@ fun ScheduleScreen(
                                     .height(20.dp)
                             )
                     }
-
                 }
 
                 item {
@@ -357,6 +490,8 @@ fun ScheduleScreen(
             panelState = panelState,
             selectedDateState = selectedDateState,
             weekType = isUpperWeek,
+            weeks = weeks,
+            pagerWeekStateSaved = pagerWeekStateSaved,
             change = viewModel::onEvent,
             hideCalendar = {
                 if (panelState.value == PanelState.CalendarPanel) {
@@ -386,6 +521,49 @@ fun ScheduleScreen(
         )
     }
 }
+
+fun getWeeksFromStartDate(
+    startDate: LocalDate,
+    weeksCount: Int
+): List<List<LocalDate>> {
+    val weeks = mutableListOf<List<LocalDate>>()
+    var currentStartOfWeek = startDate
+
+    while (currentStartOfWeek.dayOfWeek != DayOfWeek.MONDAY) {
+        currentStartOfWeek = currentStartOfWeek.minusDays(1)
+    }
+
+    repeat(weeksCount) {
+        val week = (0 until 7).map { currentStartOfWeek.plusDays(it.toLong()) }
+        weeks.add(week)
+        currentStartOfWeek = currentStartOfWeek.plusWeeks(1)
+    }
+
+    return weeks
+}
+
+fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
+    for (i in weeks.indices) {
+
+        for (j in weeks[i].indices) {
+
+            if (weeks[i][j].month == currentDate.month) {
+                weeks[i].forEach { day ->
+                    if (day.dayOfMonth == currentDate.dayOfMonth)
+                        return i
+                }
+            }
+        }
+    }
+
+    return 0
+}
+
+fun getCurrentTypeWeek(
+    typeWeekNow: Boolean,
+    prevPage: Int,
+    currentPage: Int
+) = if (prevPage % 2 == currentPage % 2) typeWeekNow else !typeWeekNow
 
 @Preview(showBackground = true)
 @Composable
