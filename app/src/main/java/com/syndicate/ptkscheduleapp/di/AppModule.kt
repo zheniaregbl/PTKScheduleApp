@@ -2,7 +2,7 @@ package com.syndicate.ptkscheduleapp.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.syndicate.ptkscheduleapp.core.AppConstants
+import com.syndicate.ptkscheduleapp.BuildConfig
 import com.syndicate.ptkscheduleapp.data.remote.ScheduleApi
 import com.syndicate.ptkscheduleapp.data.repository.ScheduleRepositoryImpl
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
@@ -23,7 +23,7 @@ object AppModule {
     @Singleton
     fun provideScheduleApi(): ScheduleApi {
         return Retrofit.Builder()
-            .baseUrl(AppConstants.BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ScheduleApi::class.java)
