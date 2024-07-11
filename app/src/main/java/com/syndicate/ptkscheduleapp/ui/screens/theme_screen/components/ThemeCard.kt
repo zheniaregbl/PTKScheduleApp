@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
 import com.syndicate.ptkscheduleapp.ui.theme.SelectedBlue
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 
 @Composable
 fun ThemeCard(

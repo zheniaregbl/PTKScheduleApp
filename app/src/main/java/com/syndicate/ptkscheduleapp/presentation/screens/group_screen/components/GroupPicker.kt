@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components
+package com.syndicate.ptkscheduleapp.presentation.screens.group_screen.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.syndicate.ptkscheduleapp.extension.colorsPalette
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
@@ -49,8 +50,7 @@ fun GroupPicker(
     visibleItemsCount: Int = 5,
     textModifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
-    fontSize: TextUnit = 40.sp,
-    dividerColor: Color = LocalContentColor.current,
+    fontSize: TextUnit = 40.sp
 ) {
 
     val itemsPicker = if (items.isNullOrEmpty()) listOf(
@@ -68,7 +68,7 @@ fun GroupPicker(
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
     val itemHeightPixels = remember { mutableIntStateOf(0) }
-    val itemHeightDp = pixelsToDp(itemHeightPixels.value)
+    val itemHeightDp = pixelsToDp(itemHeightPixels.intValue)
 
     val fadingEdgeGradient = remember {
         Brush.verticalGradient(
@@ -101,10 +101,10 @@ fun GroupPicker(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = textStyle,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = MaterialTheme.colorsPalette.contentColor,
                     fontSize = fontSize,
                     modifier = Modifier
-                        .onSizeChanged { size -> itemHeightPixels.value = size.height }
+                        .onSizeChanged { size -> itemHeightPixels.intValue = size.height }
                         .then(textModifier)
                 )
             }
@@ -112,12 +112,12 @@ fun GroupPicker(
 
         HorizontalDivider(
             modifier = Modifier.offset(y = itemHeightDp * visibleItemsMiddle),
-            color = dividerColor
+            color = MaterialTheme.colorsPalette.contentColor
         )
 
         HorizontalDivider(
             modifier = Modifier.offset(y = itemHeightDp * (visibleItemsMiddle + 1)),
-            color = dividerColor
+            color = MaterialTheme.colorsPalette.contentColor
         )
 
     }

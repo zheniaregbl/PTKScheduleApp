@@ -29,23 +29,23 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.ui.theme.MainBlue
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
     isFirstStart: Boolean = true,
-    userThemeMode: ThemeMode = ThemeMode.FIRST,
+    userThemeMode: ThemeMode = ThemeMode.LIGHT,
     navigateToCourse: () -> Unit = { },
     navigateToSchedule: () -> Unit = { }
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(
             resId = when (userThemeMode) {
-                ThemeMode.FIRST -> R.raw.yaroslav_lottie_blue
-                ThemeMode.SECOND, ThemeMode.FOURTH -> R.raw.yaroslav_lottie_white
-                ThemeMode.THIRD -> R.raw.yaroslav_lottie_gray
+                ThemeMode.LIGHT -> R.raw.yaroslav_lottie_blue
+                ThemeMode.CAPPUCCINO, ThemeMode.DARK -> R.raw.yaroslav_lottie_white
+                ThemeMode.GRAY -> R.raw.yaroslav_lottie_gray
             }
         )
     )
@@ -76,7 +76,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .background(
-                color = if (userThemeMode == ThemeMode.SECOND) MainBlue else Color.Transparent
+                color = if (userThemeMode == ThemeMode.CAPPUCCINO) MainBlue else Color.Transparent
             )
             .composed { modifier }
     ) {
@@ -111,9 +111,9 @@ fun SplashScreen(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
                     color = when (userThemeMode) {
-                        ThemeMode.FIRST -> MainBlue
-                        ThemeMode.SECOND, ThemeMode.FOURTH -> Color.White
-                        ThemeMode.THIRD -> GrayThirdTheme
+                        ThemeMode.LIGHT -> MainBlue
+                        ThemeMode.CAPPUCCINO, ThemeMode.DARK -> Color.White
+                        ThemeMode.GRAY -> GrayThirdTheme
                     }
                 )
             }

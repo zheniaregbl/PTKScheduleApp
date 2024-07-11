@@ -42,7 +42,7 @@ import com.syndicate.ptkscheduleapp.ui.theme.FourthThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.ui.theme.MainBlue
 import com.syndicate.ptkscheduleapp.ui.theme.SecondThemeBackground
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
 
 @Composable
@@ -50,7 +50,7 @@ fun ThemeScreen(
     modifier: Modifier = Modifier,
     navigateToBack: () -> Unit = { },
     changeTheme: (ThemeMode) -> Unit = { },
-    userThemeMode: ThemeMode = ThemeMode.FIRST
+    userThemeMode: ThemeMode = ThemeMode.LIGHT
 ) {
 
     var selectedTheme by remember {
@@ -161,9 +161,9 @@ fun ThemeScreen(
             ) {
                 item {
                     ThemeCard(
-                        themeMode = ThemeMode.FIRST,
+                        themeMode = ThemeMode.LIGHT,
                         isDark = false,
-                        isSelected = selectedTheme == ThemeMode.FIRST,
+                        isSelected = selectedTheme == ThemeMode.LIGHT,
                         backgroundColor = FirstThemeBackground,
                         borderColor = SecondThemeBackground,
                         textTheme = "Светлый режим",
@@ -177,9 +177,9 @@ fun ThemeScreen(
 
                 item {
                     ThemeCard(
-                        themeMode = ThemeMode.SECOND,
+                        themeMode = ThemeMode.CAPPUCCINO,
                         isDark = false,
-                        isSelected = selectedTheme == ThemeMode.SECOND,
+                        isSelected = selectedTheme == ThemeMode.CAPPUCCINO,
                         backgroundColor = SecondThemeBackground,
                         borderColor = FirstThemeBackground,
                         textTheme = "Светло-серый режим",
@@ -193,9 +193,9 @@ fun ThemeScreen(
 
                 item {
                     ThemeCard(
-                        themeMode = ThemeMode.THIRD,
+                        themeMode = ThemeMode.GRAY,
                         isDark = true,
-                        isSelected = selectedTheme == ThemeMode.THIRD,
+                        isSelected = selectedTheme == ThemeMode.GRAY,
                         backgroundColor = ThirdThemeBackground,
                         borderColor = GrayThirdTheme,
                         textTheme = "Тёмно-серый режим",
@@ -209,9 +209,9 @@ fun ThemeScreen(
 
                 item {
                     ThemeCard(
-                        themeMode = ThemeMode.FOURTH,
+                        themeMode = ThemeMode.DARK,
                         isDark = true,
-                        isSelected = selectedTheme == ThemeMode.FOURTH,
+                        isSelected = selectedTheme == ThemeMode.DARK,
                         backgroundColor = FourthThemeBackground,
                         borderColor = ThirdThemeBackground,
                         textTheme = "Тёмный режим",

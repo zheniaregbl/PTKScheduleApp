@@ -24,7 +24,7 @@ import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.ScheduleScreen
 import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.SettingScreen
 import com.syndicate.ptkscheduleapp.ui.screens.splash_screen.SplashScreen
 import com.syndicate.ptkscheduleapp.ui.screens.theme_screen.ThemeScreen
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainEvent
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -159,8 +159,8 @@ fun AppNavigation(
                 },
                 userMode = state.userMode,
                 isDarkTheme = when (state.colorThemeMode) {
-                    ThemeMode.FIRST, ThemeMode.SECOND -> false
-                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                    ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                    ThemeMode.GRAY, ThemeMode.DARK -> true
                 }
             )
         }
@@ -185,8 +185,8 @@ fun AppNavigation(
                 panelState = panelState,
                 isUpperWeek = state.isUpperWeek,
                 isDarkTheme = when (state.colorThemeMode) {
-                    ThemeMode.FIRST, ThemeMode.SECOND -> false
-                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                    ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                    ThemeMode.GRAY, ThemeMode.DARK -> true
                 }
             )
         }
@@ -205,8 +205,8 @@ fun AppNavigation(
                     .fillMaxSize()
                     .padding(paddingValues),
                 isDarkTheme = when (state.colorThemeMode) {
-                    ThemeMode.FIRST, ThemeMode.SECOND -> false
-                    ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                    ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                    ThemeMode.GRAY, ThemeMode.DARK -> true
                 },
                 navigateToTheme = {
                     navController.navigate(ScreenRoute.ThemeScreen.route)

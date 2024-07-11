@@ -41,8 +41,7 @@ fun ShimmerItem(
     )
 
     Spacer(
-        modifier = Modifier
-            .composed { modifier }
+        modifier = modifier
             .background(
                 brush = brush
             )

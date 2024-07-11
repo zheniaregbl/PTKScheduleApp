@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.ui.utils
+package com.syndicate.ptkscheduleapp.presentation.utils
 
 import android.app.Activity
 import android.content.Context

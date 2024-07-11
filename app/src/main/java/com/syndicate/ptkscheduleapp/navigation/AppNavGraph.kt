@@ -26,7 +26,7 @@ import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.navigation.utils.getCurrentRoute
 import com.syndicate.ptkscheduleapp.ui.bottom_navigation_bar.BottomMenu
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 import com.syndicate.ptkscheduleapp.view_model.app_view_model.MainViewModel
 
 @Composable
@@ -82,8 +82,8 @@ fun AppNavGraph(
                         panelState = topDatePanelState,
                         selectedItemIndex = selectedItemIndex,
                         isDarkTheme = when (state.colorThemeMode) {
-                            ThemeMode.FIRST, ThemeMode.SECOND -> false
-                            ThemeMode.THIRD, ThemeMode.FOURTH -> true
+                            ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                            ThemeMode.GRAY, ThemeMode.DARK -> true
                         }
                     )
                     Spacer(

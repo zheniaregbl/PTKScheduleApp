@@ -8,7 +8,7 @@ import com.syndicate.ptkscheduleapp.data.model.MainState
 import com.syndicate.ptkscheduleapp.data.model.UserMode
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -98,11 +98,11 @@ class MainViewModel @Inject constructor(
             val isFirstStart = sharedPreferences.getInt("firstStart", 1) == 1
 
             val appTheme = when (sharedPreferences.getInt("app_theme", 0)) {
-                1 -> ThemeMode.FIRST
-                2 -> ThemeMode.SECOND
-                3 -> ThemeMode.THIRD
-                4 -> ThemeMode.FOURTH
-                else -> ThemeMode.FIRST
+                1 -> ThemeMode.LIGHT
+                2 -> ThemeMode.CAPPUCCINO
+                3 -> ThemeMode.GRAY
+                4 -> ThemeMode.DARK
+                else -> ThemeMode.LIGHT
             }
 
             state.update {
@@ -146,10 +146,10 @@ class MainViewModel @Inject constructor(
     private fun changeAppTheme(newTheme: ThemeMode) {
         viewModelScope.launch(Dispatchers.IO) {
             val numberTheme = when (newTheme) {
-                ThemeMode.FIRST -> 1
-                ThemeMode.SECOND -> 2
-                ThemeMode.THIRD -> 3
-                ThemeMode.FOURTH -> 4
+                ThemeMode.LIGHT -> 1
+                ThemeMode.CAPPUCCINO -> 2
+                ThemeMode.GRAY -> 3
+                ThemeMode.DARK -> 4
             }
 
             sharedPreferences.edit().putInt("app_theme", numberTheme).apply()

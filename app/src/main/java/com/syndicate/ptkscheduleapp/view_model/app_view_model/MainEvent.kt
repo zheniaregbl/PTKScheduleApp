@@ -1,7 +1,7 @@
 package com.syndicate.ptkscheduleapp.view_model.app_view_model
 
 import com.syndicate.ptkscheduleapp.data.model.UserMode
-import com.syndicate.ptkscheduleapp.ui.theme.ThemeMode
+import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 
 sealed interface MainEvent {
 
