@@ -51,14 +51,18 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.PanelState
 import com.syndicate.ptkscheduleapp.data.model.SwipeDirection
 import com.syndicate.ptkscheduleapp.extension.colorsPalette
+import com.syndicate.ptkscheduleapp.presentation.utils.AutoResizeText
 import com.syndicate.ptkscheduleapp.presentation.utils.ColorfulRipple
+import com.syndicate.ptkscheduleapp.presentation.utils.FontSizeRange
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentTypeWeek
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentWeek
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getWeeksFromStartDate
@@ -243,7 +247,7 @@ fun DatePanel(
                             text = "${monthText.value}, ${yearText.intValue}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontSize = 17.sp,
-                            fontWeight = FontWeight.Normal,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorsPalette.contentColor
                         )
 
@@ -275,12 +279,16 @@ fun DatePanel(
                             contentAlignment = Alignment.Center
                         ) {
 
-                            Text(
+                            AutoResizeText(
                                 text = it,
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorsPalette.contentColor
+                                color = MaterialTheme.colorsPalette.contentColor,
+                                maxLines = 1,
+                                fontSizeRange = FontSizeRange(
+                                    min = 12.sp,
+                                    max = 15.sp
+                                )
                             )
                         }
                     }
@@ -471,12 +479,17 @@ private fun WeekPanel(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
+                            
+                            AutoResizeText(
                                 text = date.dayOfMonth.toString(),
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorsPalette.contentColor
+                                color = MaterialTheme.colorsPalette.contentColor,
+                                maxLines = 1,
+                                fontSizeRange = FontSizeRange(
+                                    min = 12.sp,
+                                    max = 15.sp
+                                )
                             )
                         }
                     }
@@ -738,9 +751,9 @@ private fun DateButton(
 
             Icon(
                 modifier = Modifier
-                    .size(25.dp),
+                    .size(26.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_date),
-                contentDescription = null,
+                contentDescription = "Date button",
                 tint = MaterialTheme.colorsPalette.contentColor
             )
         }
@@ -890,6 +903,7 @@ private fun syncPanelRework(
 }
 
 @Preview
+@PreviewFontScale
 @Composable
 private fun PreviewTopDatePanel() {
     DatePanel()

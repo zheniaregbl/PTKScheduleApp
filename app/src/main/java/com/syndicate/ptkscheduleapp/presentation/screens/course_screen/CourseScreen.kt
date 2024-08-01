@@ -97,7 +97,7 @@ fun CourseScreenContent(
 
             SelectionCourseSection(
                 courseList = courseList,
-                selectedCourse = selectedCourse,
+                courseProvider = { selectedCourse },
                 onCourseClick = { selectedCourse = it }
             )
 

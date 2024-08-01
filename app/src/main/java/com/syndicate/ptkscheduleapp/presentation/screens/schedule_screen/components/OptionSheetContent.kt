@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +50,7 @@ import com.syndicate.ptkscheduleapp.extension.advanceShadow
 import com.syndicate.ptkscheduleapp.extension.colorPalette
 import com.syndicate.ptkscheduleapp.extension.colorsPalette
 import com.syndicate.ptkscheduleapp.presentation.utils.ColorfulRipple
+import com.syndicate.ptkscheduleapp.presentation.utils.setupSystemBars
 import com.syndicate.ptkscheduleapp.ui.theme.AppTheme
 import com.syndicate.ptkscheduleapp.ui.theme.CustomGreen
 import com.syndicate.ptkscheduleapp.ui.theme.DarkRipple
@@ -383,7 +385,7 @@ private fun ThemeBox(
     Box(
         modifier = modifier
             .clickable(
-                enabled = enable
+                enabled = enable && themeMode != currentThemeMode
             ) { onClick(offset) }
             .onGloballyPositioned {
                 offset = Offset(

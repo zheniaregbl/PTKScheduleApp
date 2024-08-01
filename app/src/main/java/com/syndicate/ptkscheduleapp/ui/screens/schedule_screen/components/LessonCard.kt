@@ -16,6 +16,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -231,7 +234,7 @@ fun LessonInfo(
 fun ColorLine(
     modifier: Modifier = Modifier
 ) {
-    val hsl = generateColor()
+    val hsl by remember { mutableStateOf(generateColor()) }
 
     Spacer(
         modifier = modifier
