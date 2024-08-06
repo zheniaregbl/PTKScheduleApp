@@ -48,8 +48,8 @@ import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components
 import com.syndicate.ptkscheduleapp.ui.screens.group_selection_screen.components.rememberPickerState
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.ThirdThemeBackground
-import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionEvent
-import com.syndicate.ptkscheduleapp.view_model.group_selection_screen_view_model.GroupSelectionViewModel
+import com.syndicate.ptkscheduleapp.view_model.group_selection_view_model.GroupSelectionEvent
+import com.syndicate.ptkscheduleapp.view_model.group_selection_view_model.GroupSelectionViewModel
 
 @Composable
 fun GroupSelectionScreen(

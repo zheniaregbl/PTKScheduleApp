@@ -3,6 +3,7 @@ package com.syndicate.ptkscheduleapp.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.syndicate.ptkscheduleapp.BuildConfig
+import com.syndicate.ptkscheduleapp.data.remote.ReworkScheduleApi
 import com.syndicate.ptkscheduleapp.data.remote.ScheduleApi
 import com.syndicate.ptkscheduleapp.data.repository.ScheduleRepositoryImpl
 import com.syndicate.ptkscheduleapp.domain.repository.ScheduleRepository
@@ -27,6 +28,16 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ScheduleApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReworkScheduleApi(): ReworkScheduleApi {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ReworkScheduleApi::class.java)
     }
 
     @Provides

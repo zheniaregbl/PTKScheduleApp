@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.view_model.main_view_model
+package com.syndicate.ptkscheduleapp.view_model.app_view_model
 
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi

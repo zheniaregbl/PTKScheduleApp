@@ -34,11 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,14 +49,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.PanelState
-import com.syndicate.ptkscheduleapp.data.model.SwipeDirection
 import com.syndicate.ptkscheduleapp.extension.colorsPalette
 import com.syndicate.ptkscheduleapp.presentation.utils.AutoResizeText
 import com.syndicate.ptkscheduleapp.presentation.utils.ColorfulRipple
@@ -72,7 +68,7 @@ import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.ui.theme.LightRipple
 import com.syndicate.ptkscheduleapp.ui.theme.utils.LocalColorsPalette
 import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
-import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
+import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ScheduleEvent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month

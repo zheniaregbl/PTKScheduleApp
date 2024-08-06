@@ -1,6 +1,6 @@
 package com.syndicate.ptkscheduleapp.info_functions
 
-import com.syndicate.ptkscheduleapp.core.JsonFieldName
+import com.syndicate.ptkscheduleapp.common.JsonFieldName
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import org.json.JSONArray
 

@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model
+package com.syndicate.ptkscheduleapp.view_model.schedule_view_model
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
@@ -72,15 +72,6 @@ class ScheduleViewModel @Inject constructor(
         dayOfWeek: DayOfWeek,
         isUpperWeek: Boolean
     ) {
-
-        /*if (!_scheduleList.value.isNullOrEmpty()) {
-
-            Log.d("checkSizeWeeks", "size:" + _scheduleList.value!!.size.toString())
-
-            for (list in _scheduleList.value!!) {
-                Log.d("checkSizeWeeks", list.size.toString())
-            }
-        }*/
 
         val daySchedule = when (dayOfWeek) {
             DayOfWeek.MONDAY -> _scheduleList.value?.get(0)

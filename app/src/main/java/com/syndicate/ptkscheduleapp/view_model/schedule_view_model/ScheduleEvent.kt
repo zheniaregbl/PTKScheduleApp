@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model
+package com.syndicate.ptkscheduleapp.view_model.schedule_view_model
 
 import java.time.DayOfWeek
 import java.time.LocalDate

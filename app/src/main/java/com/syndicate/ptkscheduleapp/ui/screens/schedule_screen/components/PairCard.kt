@@ -37,7 +37,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Composable
-fun LessonCard(
+fun PairCard(
     modifier: Modifier = Modifier,
     lessonItem: LessonItem = LessonItem(
         time = "8.30-10.10",
@@ -52,6 +52,7 @@ fun LessonCard(
     Box(
         modifier = modifier
     ) {
+
         Row(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
@@ -59,14 +60,17 @@ fun LessonCard(
                     top = 11.dp, start = 20.dp, bottom = 11.dp
                 )
         ) {
+
             ColorLine(
                 modifier = Modifier
                     .fillMaxHeight()
             )
+
             Spacer(
                 modifier = Modifier
                     .width(10.dp)
             )
+
             LessonInfo(
                 lessonItem = lessonItem,
                 isLast = true,
@@ -93,7 +97,7 @@ fun LessonCard(
 }
 
 @Composable
-fun LessonCard(
+fun PairCard(
     modifier: Modifier = Modifier,
     lessonList: List<LessonItem> = listOf(
         LessonItem(),
@@ -193,16 +197,15 @@ fun LessonInfo(
             modifier = Modifier
                 .height(3.dp)
         )
-        if (lessonItem.teacher != "Не указан" && lessonItem.room != "Не указан" &&
-            lessonItem.lessonTitle != "Не будет" && lessonItem.lessonTitle != "" &&
-            !lessonItem.isAbsent)
-            Text(
-                text = "${lessonItem.teacher}, кабинет ${lessonItem.room}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal,
-                color = if (isDark) Color.White else Color.Black
-            )
+
+        Text(
+            text = "${lessonItem.teacher}, кабинет ${lessonItem.room.lowercase()}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal,
+            color = if (isDark) Color.White else Color.Black
+        )
+
         if (isDivision) {
             Text(
                 text = "п/г $subgroup",
@@ -214,10 +217,12 @@ fun LessonInfo(
         }
 
         if (!isLast) {
+
             Spacer(
                 modifier = Modifier
                     .height(6.dp)
             )
+
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -253,7 +258,7 @@ fun ColorLine(
 @Preview(showBackground = false)
 @Composable
 fun PreviewLessonCardOneLesson() {
-    LessonCard(
+    PairCard(
         lessonItem = LessonItem()
     )
 }
@@ -261,7 +266,7 @@ fun PreviewLessonCardOneLesson() {
 @Preview(showBackground = false)
 @Composable
 fun PreviewLessonCardSomeLesson() {
-    LessonCard(
+    PairCard(
         lessonList = listOf(
             LessonItem(),
             LessonItem()

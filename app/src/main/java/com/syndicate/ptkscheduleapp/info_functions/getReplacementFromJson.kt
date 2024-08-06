@@ -1,7 +1,7 @@
 package com.syndicate.ptkscheduleapp.info_functions
 
 import android.util.Log
-import com.syndicate.ptkscheduleapp.core.JsonFieldName
+import com.syndicate.ptkscheduleapp.common.JsonFieldName
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import org.json.JSONObject
 import java.time.LocalDate
@@ -44,8 +44,6 @@ fun getReplacementFromJsonByDay(
                 )
             )
         }
-
-        Log.d("checkReplacement", "success")
 
     } catch (_: Exception) {
 

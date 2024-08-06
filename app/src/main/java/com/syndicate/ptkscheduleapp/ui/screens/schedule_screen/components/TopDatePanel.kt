@@ -3,10 +3,8 @@ package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.EaseOutQuad
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,7 +58,7 @@ import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentWeek
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getWeeksFromStartDate
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
-import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
+import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ScheduleEvent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month

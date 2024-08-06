@@ -26,7 +26,7 @@ fun ShimmerItem(
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             tween(
-                durationMillis = 1200,
+                durationMillis = 1000,
                 easing = FastOutSlowInEasing
             ),
             RepeatMode.Reverse

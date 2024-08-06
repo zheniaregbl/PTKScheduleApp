@@ -1,6 +1,5 @@
 package com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen
 
-import android.util.Log
 import androidx.compose.animation.core.Ease
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,7 +7,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,9 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,31 +46,36 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.syndicate.ptkscheduleapp.common.utils.ScheduleUtils
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
 import com.syndicate.ptkscheduleapp.data.model.PanelState
+import com.syndicate.ptkscheduleapp.domain.model.PairItem
+import com.syndicate.ptkscheduleapp.domain.model.RequestState
 import com.syndicate.ptkscheduleapp.extension.colorsPalette
 import com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components.DatePanel
 import com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components.OptionSheetContent
 import com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components.ScheduleScaffold
 import com.syndicate.ptkscheduleapp.presentation.utils.FadeTransitions
 import com.syndicate.ptkscheduleapp.presentation.utils.setupSystemBars
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.PairCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
 import com.syndicate.ptkscheduleapp.ui.theme.AppTheme
 import com.syndicate.ptkscheduleapp.ui.theme.utils.LocalColorsPalette
 import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
-import com.syndicate.ptkscheduleapp.view_model.main_view_model.AppEvent
-import com.syndicate.ptkscheduleapp.view_model.main_view_model.AppViewModel
-import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ReworkScheduleViewModel
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.AppEvent
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.AppViewModel
+import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ReworkScheduleViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 
@@ -87,13 +92,15 @@ fun ScheduleScreen(
 
     val context = LocalContext.current
 
-    val scheduleViewModel = hiltViewModel<ReworkScheduleViewModel>()
-
     val themeModeState by appViewModel.themeModeState.collectAsState()
     val initialSheetValue by appViewModel.initialSheetValue.collectAsState()
     val enableChangeTheme by appViewModel.enableChangeTheme.collectAsState()
 
-    LaunchedEffect(themeModeState) {
+    val scheduleViewModel = hiltViewModel<ReworkScheduleViewModel>()
+
+    val schedule by scheduleViewModel.schedule.collectAsState()
+
+    LaunchedEffect(Unit) {
         delay(500)
         setupSystemBars(
             context = context,
@@ -105,6 +112,7 @@ fun ScheduleScreen(
     ScheduleScreenContent(
         modifier = Modifier
             .fillMaxSize(),
+        schedule = schedule,
         initialSheetValue = initialSheetValue,
         enableChangeTheme = enableChangeTheme,
         onChangeTheme = { themeMode, offset ->
@@ -122,6 +130,8 @@ fun ScheduleScreen(
 @Composable
 fun ScheduleScreenContent(
     modifier: Modifier = Modifier,
+    schedule: RequestState<List<List<PairItem>>> = RequestState.Success(listOf(emptyList())),
+    isUpperWeek: RequestState<Boolean> = RequestState.Success(false),
     initialSheetValue: BottomSheetValue = BottomSheetValue.Collapsed,
     enableChangeTheme: Boolean = true,
     onChangeTheme: (ThemeMode, Offset) -> Unit = { _: ThemeMode, _: Offset -> },
@@ -153,17 +163,16 @@ fun ScheduleScreenContent(
     val panelState = remember { mutableStateOf(PanelState.WeekPanel) }
     val selectedDateState = remember { mutableStateOf(LocalDate.now()) }
 
-    val weeks = getWeeksFromStartDate(
+    val weeks = ScheduleUtils.getWeeksFromStartDate(
         LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
         78
     )
 
-    val initWeekNumber = getCurrentWeek(
+    val initWeekNumber = ScheduleUtils.getCurrentWeek(
         weeks,
         LocalDate.now()
     )
     val currentSchedulePage = (initWeekNumber * 7) + weeks[initWeekNumber].indexOf(selectedDateState.value)
-    Log.d("currentSchedulePage", "$initWeekNumber $currentSchedulePage")
     val pagerWeekStateSaved = remember {
         mutableIntStateOf(initWeekNumber)
     }
@@ -181,8 +190,6 @@ fun ScheduleScreenContent(
         val indexInWeek = currentPage % 7
 
         selectedDateState.value = weeks[weekNumber][indexInWeek]
-
-        Log.d("schedulePagerState", "$currentPage")
     }
 
     Box(
@@ -200,9 +207,7 @@ fun ScheduleScreenContent(
             backgroundColor = MaterialTheme.colorsPalette.backgroundColor,
             onDismiss = { scope.launch { bottomSheetState.collapse() } },
             sheetContent = {
-
                 Box {
-
                     OptionSheetContent(
                         enableChangeTheme = enableChangeTheme,
                         onChangeTheme = { themeMode, offset ->
@@ -221,68 +226,231 @@ fun ScheduleScreenContent(
             }
         ) {
 
-            HorizontalPager(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding(),
-                state = schedulePagerState
-            ) {
+            schedule.DisplayResult(
+                onLoading = {
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            horizontal = 16.dp
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .padding(
+                                horizontal = 16.dp
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                    item {
-                        Spacer(
-                            modifier = Modifier
-                                .height(160.dp)
-                        )
-                    }
+                        item {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(160.dp)
+                            )
+                        }
 
-                    item {
-                        LessonCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .shadow(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(10.dp),
-                                    clip = true,
-                                    spotColor = Color.Black.copy(alpha = 0.3f),
-                                    ambientColor = Color.Black.copy(alpha = 0.3f)
+                        items(4) { index ->
+
+                            ShimmerItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .size(80.dp)
+                            )
+                            if (index != 3)
+                                Spacer(
+                                    modifier = Modifier
+                                        .height(20.dp)
                                 )
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    color = MaterialTheme.colorsPalette.backgroundColor
-                                )
-                                .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorsPalette.otherColor,
-                                    shape = RoundedCornerShape(10.dp)
-                                ),
-                            lessonItem = LessonItem()
-                        )
+                        }
                     }
+                },
+                onSuccess = {
 
-                    item {
-                        Text(
-                            text = "$it",
-                            color = MaterialTheme.colorsPalette.contentColor
+                    if (isUpperWeek.isSuccess()) {
+
+                        val scheduleList = listOf(
+                            ScheduleUtils.getWeekScheduleByWeekType(schedule.getSuccessData(), true),
+                            ScheduleUtils.getWeekScheduleByWeekType(schedule.getSuccessData(), false)
                         )
-                    }
 
-                    item {
-                        Spacer(
+                        val startScheduleIndex = if (
+                            ScheduleUtils.getCurrentTypeWeek(
+                                isUpperWeek.getSuccessData(),
+                                initWeekNumber,
+                                0
+                            )
+                        ) 0 else 1
+
+                        HorizontalPager(
                             modifier = Modifier
-                                .height(20.dp)
-                        )
+                                .fillMaxSize()
+                                .statusBarsPadding(),
+                            state = schedulePagerState
+                        ) { page ->
+
+                            val currentScheduleIndex = if (page / 7 % 2 == 0) startScheduleIndex
+                                else 1 - startScheduleIndex
+
+                            val currentSchedule = scheduleList[currentScheduleIndex][page % 7]
+
+                            var listSeveralLessons = ArrayList<LessonItem>()
+
+                            if (currentSchedule.isNotEmpty()) {
+
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(
+                                            horizontal = 16.dp
+                                        ),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+
+                                    item {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(160.dp)
+                                        )
+                                    }
+
+                                    itemsIndexed(currentSchedule) { index, pair ->
+
+                                        if (pair.subgroupNumber == 0) {
+
+                                            PairCard(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .shadow(
+                                                        elevation = 4.dp,
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        clip = true,
+                                                        spotColor = Color.Black.copy(alpha = 0.3f),
+                                                        ambientColor = Color.Black.copy(alpha = 0.3f)
+                                                    )
+                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .background(
+                                                        color = MaterialTheme.colorsPalette.backgroundColor
+                                                    )
+                                                    .border(
+                                                        width = 2.dp,
+                                                        color = MaterialTheme.colorsPalette.otherColor,
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    ),
+                                                lessonItem = LessonItem(
+                                                    time = pair.time,
+                                                    lessonTitle = pair.subject,
+                                                    teacher = pair.teacher,
+                                                    room = pair.room,
+                                                    pairNumber = pair.pairNumber
+                                                ),
+                                                isDark = when (LocalColorsPalette.current.themeMode) {
+                                                    ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                                                    else -> true
+                                                }
+                                            )
+
+                                            if (index != currentSchedule.lastIndex)
+                                                Spacer(modifier = Modifier.height(20.dp))
+
+                                        } else {
+
+                                            listSeveralLessons.add(
+                                                LessonItem(
+                                                    time = pair.time,
+                                                    lessonTitle = pair.subject,
+                                                    teacher = pair.teacher,
+                                                    room = pair.room,
+                                                    pairNumber = pair.pairNumber,
+                                                    subgroupNumber = pair.subgroupNumber
+                                                )
+                                            )
+
+                                            val list = ArrayList<LessonItem>()
+
+                                            currentSchedule.forEach {
+                                                if (it.pairNumber == pair.pairNumber)
+                                                    list.add(
+                                                        LessonItem(
+                                                            time = it.time,
+                                                            lessonTitle = it.subject,
+                                                            teacher = it.teacher,
+                                                            room = it.room,
+                                                            pairNumber = it.pairNumber,
+                                                            subgroupNumber = it.subgroupNumber
+                                                        )
+                                                    )
+                                            }
+
+                                            if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
+                                                || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
+                                                || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != pair.pairNumber
+                                            ) {
+
+                                                PairCard(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .shadow(
+                                                            elevation = 4.dp,
+                                                            shape = RoundedCornerShape(10.dp),
+                                                            clip = true,
+                                                            spotColor = Color.Black.copy(alpha = 0.3f),
+                                                            ambientColor = Color.Black.copy(alpha = 0.3f)
+                                                        )
+                                                        .clip(RoundedCornerShape(10.dp))
+                                                        .background(
+                                                            color = MaterialTheme.colorsPalette.backgroundColor
+                                                        )
+                                                        .border(
+                                                            width = 2.dp,
+                                                            color = MaterialTheme.colorsPalette.otherColor,
+                                                            shape = RoundedCornerShape(10.dp)
+                                                        ),
+                                                    lessonList = listSeveralLessons,
+                                                    isDark = when (LocalColorsPalette.current.themeMode) {
+                                                        ThemeMode.LIGHT, ThemeMode.CAPPUCCINO -> false
+                                                        else -> true
+                                                    }
+                                                )
+
+                                                if (index != currentSchedule.lastIndex)
+                                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                                listSeveralLessons = ArrayList()
+                                            }
+                                        }
+                                    }
+
+                                    item {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(80.dp)
+                                        )
+                                    }
+                                }
+
+                            } else {
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    Text(
+                                        text = "Нет занятий",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 24.sp,
+                                        color = MaterialTheme.colorsPalette.contentColor
+                                    )
+                                }
+
+                            }
+                        }
                     }
+                },
+                onError = {
+
                 }
-            }
+            )
 
             DatePanel(
                 modifier = Modifier
@@ -303,49 +471,6 @@ fun ScheduleScreenContent(
         }
     }
 }
-
-private fun getWeeksFromStartDate(
-    startDate: LocalDate,
-    weeksCount: Int
-): List<List<LocalDate>> {
-    val weeks = mutableListOf<List<LocalDate>>()
-    var currentStartOfWeek = startDate
-
-    while (currentStartOfWeek.dayOfWeek != DayOfWeek.MONDAY) {
-        currentStartOfWeek = currentStartOfWeek.minusDays(1)
-    }
-
-    repeat(weeksCount) {
-        val week = (0 until 7).map { currentStartOfWeek.plusDays(it.toLong()) }
-        weeks.add(week)
-        currentStartOfWeek = currentStartOfWeek.plusWeeks(1)
-    }
-
-    return weeks
-}
-
-private fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
-    for (i in weeks.indices) {
-
-        for (j in weeks[i].indices) {
-
-            if (weeks[i][j].month == currentDate.month) {
-                weeks[i].forEach { day ->
-                    if (day.dayOfMonth == currentDate.dayOfMonth)
-                        return i
-                }
-            }
-        }
-    }
-
-    return 0
-}
-
-fun getCurrentTypeWeek(
-    typeWeekNow: Boolean,
-    prevPage: Int,
-    currentPage: Int
-) = if (prevPage % 2 == currentPage % 2) typeWeekNow else !typeWeekNow
 
 @Composable
 private fun ScrimSheetContent(

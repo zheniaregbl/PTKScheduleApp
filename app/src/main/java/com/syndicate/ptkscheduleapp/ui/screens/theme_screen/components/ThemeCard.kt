@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.PairCard
 import com.syndicate.ptkscheduleapp.ui.theme.SelectedBlue
 import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
 
@@ -64,7 +64,7 @@ fun ThemeCard(
                         10.dp
                     )
             ) {
-                LessonCard(
+                PairCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(

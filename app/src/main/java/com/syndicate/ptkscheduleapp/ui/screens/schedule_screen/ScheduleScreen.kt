@@ -55,13 +55,13 @@ import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
 import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.LessonCard
+import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.PairCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
 import com.syndicate.ptkscheduleapp.ui.screens.setting_screen.components.NetworkConnectionDialogWithRetry
-import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleEvent
-import com.syndicate.ptkscheduleapp.view_model.schedule_screen_view_model.ScheduleViewModel
+import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ScheduleEvent
+import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ScheduleViewModel
 import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -322,7 +322,7 @@ fun ScheduleScreen(
                                         list.add(it)
                                 }
 
-                                LessonCard(
+                                PairCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .shadow(
@@ -378,12 +378,11 @@ fun ScheduleScreen(
                                 if (index != currentSchedule.lastIndex && currentSchedule[index + 1].subgroupNumber == 0
                                     || index == currentSchedule.lastIndex && currentSchedule.isNotEmpty()
                                     || index != currentSchedule.lastIndex && currentSchedule[index + 1].pairNumber != item.pairNumber
-                                /*|| index != 0 && prevLessonNumber == item.pairNumber*/
                                 ) {
 
                                     val lessons = listSeveralLessons
 
-                                    LessonCard(
+                                    PairCard(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .shadow(

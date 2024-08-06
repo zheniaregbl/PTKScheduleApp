@@ -29,7 +29,7 @@ import com.syndicate.ptkscheduleapp.presentation.screens.NavGraphs
 import com.syndicate.ptkscheduleapp.presentation.utils.CirclePath
 import com.syndicate.ptkscheduleapp.ui.theme.AppTheme
 import com.syndicate.ptkscheduleapp.presentation.utils.LockScreenOrientation
-import com.syndicate.ptkscheduleapp.view_model.main_view_model.AppViewModel
+import com.syndicate.ptkscheduleapp.view_model.app_view_model.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

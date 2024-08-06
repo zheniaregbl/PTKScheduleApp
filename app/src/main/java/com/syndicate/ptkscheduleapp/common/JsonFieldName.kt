@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.core
+package com.syndicate.ptkscheduleapp.common
 
 object JsonFieldName {
     const val day = "day_of_week"

@@ -97,7 +97,7 @@ fun ReplacementDialog(
                 ) {
 
                     if (main.size <= 1)
-                        LessonCard(
+                        PairCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shadow(
@@ -125,7 +125,7 @@ fun ReplacementDialog(
                             isDark = isDarkTheme
                         )
                     else
-                        LessonCard(
+                        PairCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shadow(
@@ -167,7 +167,7 @@ fun ReplacementDialog(
                     )
 
                     if (replacement.size <= 1)
-                        LessonCard(
+                        PairCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shadow(
@@ -192,7 +192,7 @@ fun ReplacementDialog(
                             isDark = isDarkTheme
                         )
                     else
-                        LessonCard(
+                        PairCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shadow(
