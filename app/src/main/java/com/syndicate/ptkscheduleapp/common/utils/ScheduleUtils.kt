@@ -6,6 +6,35 @@ import java.time.LocalDate
 
 object ScheduleUtils {
 
+    fun groupDailyScheduleBySubgroup(
+        dailySchedule: List<PairItem>
+    ) : List<List<PairItem>> {
+
+        var listSeveralPair = ArrayList<PairItem>()
+
+        val schedule = ArrayList<List<PairItem>>()
+
+        dailySchedule.forEachIndexed { index, pairItem ->
+
+            if (pairItem.subgroupNumber == 0)
+                schedule.add(listOf(pairItem))
+            else {
+
+                listSeveralPair.add(pairItem)
+
+                if (index != dailySchedule.lastIndex && dailySchedule[index + 1].subgroupNumber == 0
+                    || index == dailySchedule.lastIndex && dailySchedule.isNotEmpty()
+                    || index != dailySchedule.lastIndex && dailySchedule[index + 1].pairNumber != pairItem.pairNumber
+                ) {
+                    schedule.add(listSeveralPair)
+                    listSeveralPair = ArrayList()
+                }
+            }
+        }
+
+        return schedule
+    }
+
     fun getWeekScheduleByWeekType(
         inputSchedule: List<List<PairItem>>,
         isUpperWeek: Boolean
@@ -91,14 +120,9 @@ object ScheduleUtils {
 
     fun getCurrentWeek(weeks: List<List<LocalDate>>, currentDate: LocalDate): Int {
         for (i in weeks.indices) {
-
             for (j in weeks[i].indices) {
-
-                if (weeks[i][j].month == currentDate.month) {
-                    weeks[i].forEach { day ->
-                        if (day.dayOfMonth == currentDate.dayOfMonth)
-                            return i
-                    }
+                if (weeks[i][j] == currentDate) {
+                    return i
                 }
             }
         }

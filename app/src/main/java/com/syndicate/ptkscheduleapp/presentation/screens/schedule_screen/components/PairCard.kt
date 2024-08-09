@@ -1,4 +1,4 @@
-package com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components
+package com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
-import com.syndicate.ptkscheduleapp.data.model.LessonItem
+import com.syndicate.ptkscheduleapp.domain.model.PairItem
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import java.util.Random
 import kotlin.math.max
@@ -39,15 +39,9 @@ import kotlin.math.min
 @Composable
 fun PairCard(
     modifier: Modifier = Modifier,
-    lessonItem: LessonItem = LessonItem(
-        time = "8.30-10.10",
-        lessonTitle = "Математика",
-        teacher = "Ширина",
-        room = "кабинет 410"
-    ),
+    pairItem: PairItem = PairItem(),
     isDark: Boolean = false,
-    isReplacement: Boolean = false,
-    replacement: List<LessonItem> = emptyList(),
+    replacement: List<PairItem> = emptyList(),
 ) {
     Box(
         modifier = modifier
@@ -71,14 +65,14 @@ fun PairCard(
                     .width(10.dp)
             )
 
-            LessonInfo(
-                lessonItem = lessonItem,
+            PairInfo(
+                pairItem = pairItem,
                 isLast = true,
                 isDark = isDark
             )
         }
 
-        if (isReplacement)
+        if (replacement.isNotEmpty())
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -99,13 +93,12 @@ fun PairCard(
 @Composable
 fun PairCard(
     modifier: Modifier = Modifier,
-    lessonList: List<LessonItem> = listOf(
-        LessonItem(),
-        LessonItem()
+    pairList: List<PairItem> = listOf(
+        PairItem(),
+        PairItem()
     ),
     isDark: Boolean = false,
-    isReplacement: Boolean = false,
-    replacement: List<LessonItem> = emptyList()
+    replacement: List<PairItem> = emptyList()
 ) {
     Box(
         modifier = modifier
@@ -126,19 +119,19 @@ fun PairCard(
                     .width(10.dp)
             )
             Column {
-                lessonList.forEachIndexed { index, lessonItem ->
-                    LessonInfo(
-                        lessonItem = lessonItem,
+                pairList.forEachIndexed { index, lessonItem ->
+                    PairInfo(
+                        pairItem = lessonItem,
                         isDivision = true,
                         subgroup = lessonItem.subgroupNumber,
-                        isLast = index == lessonList.lastIndex,
+                        isLast = index == pairList.lastIndex,
                         isDark = isDark
                     )
                 }
             }
         }
 
-        if (isReplacement)
+        if (replacement.isNotEmpty())
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -157,13 +150,8 @@ fun PairCard(
 }
 
 @Composable
-fun LessonInfo(
-    lessonItem: LessonItem = LessonItem(
-        time = "8.30-10.10",
-        lessonTitle = "Математика",
-        teacher = "Ширина",
-        room = "410"
-    ),
+fun PairInfo(
+    pairItem: PairItem = PairItem(),
     isDivision: Boolean = false,
     subgroup: Int = 1,
     isLast: Boolean = false,
@@ -175,7 +163,7 @@ fun LessonInfo(
             .padding(end = 50.dp)
     ) {
         Text(
-            text = lessonItem.time,
+            text = pairItem.time,
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
@@ -186,7 +174,7 @@ fun LessonInfo(
                 .height(3.dp)
         )
         Text(
-            text = if (lessonItem.lessonTitle == "" || lessonItem.isAbsent) "Не будет" else lessonItem.lessonTitle,
+            text = if (pairItem.subject == "") "Не будет" else pairItem.subject,
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
@@ -199,7 +187,7 @@ fun LessonInfo(
         )
 
         Text(
-            text = "${lessonItem.teacher}, кабинет ${lessonItem.room.lowercase()}",
+            text = "${pairItem.teacher}, кабинет ${pairItem.room.lowercase()}",
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
@@ -259,7 +247,7 @@ fun ColorLine(
 @Composable
 fun PreviewLessonCardOneLesson() {
     PairCard(
-        lessonItem = LessonItem()
+        pairItem = PairItem()
     )
 }
 
@@ -267,9 +255,9 @@ fun PreviewLessonCardOneLesson() {
 @Composable
 fun PreviewLessonCardSomeLesson() {
     PairCard(
-        lessonList = listOf(
-            LessonItem(),
-            LessonItem()
+        pairList = listOf(
+            PairItem(),
+            PairItem()
         )
     )
 }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,8 +50,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
@@ -59,8 +58,6 @@ import com.syndicate.ptkscheduleapp.extension.colorsPalette
 import com.syndicate.ptkscheduleapp.presentation.utils.AutoResizeText
 import com.syndicate.ptkscheduleapp.presentation.utils.ColorfulRipple
 import com.syndicate.ptkscheduleapp.presentation.utils.FontSizeRange
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentTypeWeek
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getCurrentWeek
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.getWeeksFromStartDate
 import com.syndicate.ptkscheduleapp.ui.theme.DarkRipple
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
@@ -68,25 +65,24 @@ import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
 import com.syndicate.ptkscheduleapp.ui.theme.LightRipple
 import com.syndicate.ptkscheduleapp.ui.theme.utils.LocalColorsPalette
 import com.syndicate.ptkscheduleapp.ui.theme.utils.ThemeMode
-import com.syndicate.ptkscheduleapp.view_model.schedule_view_model.ScheduleEvent
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DatePanel(
     modifier: Modifier = Modifier,
     panelState: MutableState<PanelState> = mutableStateOf(PanelState.WeekPanel),
-    selectedDateState: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
-    weekType: Boolean = true,
+    weekPanelPagerState: PagerState,
+    selectedDate: LocalDate = LocalDate.now(),
     weeks: List<List<LocalDate>> = getWeeksFromStartDate(
         LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
         78
     ),
     pagerWeekStateSaved: MutableState<Int> = mutableIntStateOf(0),
-    change: (ScheduleEvent) -> Unit = { },
-    hideCalendar: () -> Unit = { },
-    isDarkTheme: Boolean = false
+    changeDate: (LocalDate) -> Unit = { },
+    hideCalendar: () -> Unit = { }
 ) {
 
     val months = getMonthsFromWeeks(weeks)
@@ -100,7 +96,7 @@ fun DatePanel(
     }
     val monthText = remember {
         mutableStateOf(
-            when (selectedDateState.value.month) {
+            when (selectedDate.month) {
                 Month.JANUARY -> "Январь"
                 Month.FEBRUARY -> "Февраль"
                 Month.MARCH -> "Март"
@@ -119,7 +115,7 @@ fun DatePanel(
     }
 
     val yearText = remember {
-        mutableIntStateOf(selectedDateState.value.year)
+        mutableIntStateOf(selectedDate.year)
     }
 
     val colorBorder = MaterialTheme.colorsPalette.contentColor.copy(alpha = 0.3f)
@@ -299,15 +295,14 @@ fun DatePanel(
                                 top = 6.dp,
                                 bottom = 12.dp
                             ),
-                        selectedDate = selectedDateState,
-                        weekType = weekType,
+                        pagerState = weekPanelPagerState,
+                        selectedDate = selectedDate,
                         weeks = weeks,
                         monthValue = monthValue,
                         pagerWeekStateSaved = pagerWeekStateSaved,
                         monthText = monthText,
                         yearText = yearText,
-                        change = change,
-                        isDarkTheme = isDarkTheme
+                        changeDate = changeDate
                     )
                 }
 
@@ -326,17 +321,14 @@ fun DatePanel(
                                 .padding(
                                     bottom = 12.dp
                                 ),
-                            selectedDate = selectedDateState,
-                            weekType = weekType,
-                            weekList = weeks,
+                            selectedDate = selectedDate,
                             months = months,
                             monthValue = monthValue,
                             pagerMonthStateSaved = pagerMonthStateSaved,
                             monthText = monthText,
                             yearText = yearText,
-                            change = change,
-                            hideCalendar = hideCalendar,
-                            isDarkTheme = isDarkTheme
+                            changeDate = changeDate,
+                            hideCalendar = hideCalendar
                         )
                     }
                 }
@@ -349,73 +341,60 @@ fun DatePanel(
 @Composable
 private fun WeekPanel(
     modifier: Modifier = Modifier,
-    selectedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now()),
-    weekType: Boolean,
+    pagerState: PagerState,
+    selectedDate: LocalDate = LocalDate.now(),
     weeks: List<List<LocalDate>>,
     monthValue: MutableState<Month>,
     pagerWeekStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
-    change: (ScheduleEvent) -> Unit,
-    isDarkTheme: Boolean = false
+    changeDate: (LocalDate) -> Unit = { }
 ) {
 
     val themeMode = LocalColorsPalette.current.themeMode
 
     LaunchedEffect(Unit) {
-
-        pagerWeekStateSaved.value = syncPanelRework(
-            weeks,
-            selectedDate.value
-        )
+        pagerState.scrollToPage(syncPanelRework(weeks, selectedDate))
     }
 
-    val pagerState = rememberPagerState(
-        initialPage = pagerWeekStateSaved.value,
-        initialPageOffsetFraction = 0f,
-        pageCount = { weeks.size }
-    )
-
-    LaunchedEffect(key1 = pagerWeekStateSaved.value) {
-        pagerState.scrollToPage(pagerWeekStateSaved.value)
-    }
-
-    LaunchedEffect(key1 = pagerState) {
+    LaunchedEffect(selectedDate) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
+
             pagerWeekStateSaved.value = page
+
+            Log.d("weekPanel", "selectedDate")
 
             val weekDates = weeks[page]
 
-            if (selectedDate.value !in weekDates) {
-
+            if (selectedDate !in weekDates) {
                 monthText.value = getStringByMonth(weekDates[3].month)
                 monthValue.value = weekDates[3].month
                 yearText.value = weekDates[3].year
             } else {
-
-                monthText.value = getStringByMonth(selectedDate.value.month)
-                monthValue.value = selectedDate.value.month
-                yearText.value = selectedDate.value.year
+                monthText.value = getStringByMonth(selectedDate.month)
+                monthValue.value = selectedDate.month
+                yearText.value = selectedDate.year
             }
         }
     }
 
-    LaunchedEffect(key1 = selectedDate.value) {
+    LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
+
             pagerWeekStateSaved.value = page
+
+            Log.d("weekPanel", "pagerState")
 
             val weekDates = weeks[page]
 
-            if (selectedDate.value !in weekDates) {
-
+            if (selectedDate !in weekDates) {
                 monthText.value = getStringByMonth(weekDates[3].month)
                 monthValue.value = weekDates[3].month
                 yearText.value = weekDates[3].year
             } else {
-
-                monthText.value = getStringByMonth(selectedDate.value.month)
-                monthValue.value = selectedDate.value.month
-                yearText.value = selectedDate.value.year
+                monthText.value = getStringByMonth(selectedDate.month)
+                monthValue.value = selectedDate.month
+                yearText.value = selectedDate.year
             }
         }
     }
@@ -454,23 +433,10 @@ private fun WeekPanel(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .clickable {
-                                    change(
-                                        ScheduleEvent.ChangeSchedule(
-                                            date.dayOfWeek,
-                                            getCurrentTypeWeek(
-                                                weekType,
-                                                getCurrentWeek(weeks, LocalDate.now()),
-                                                getCurrentWeek(weeks, date)
-                                            ),
-                                            date
-                                        )
-                                    )
-                                    selectedDate.value = date
-                                }
+                                .clickable { changeDate(date) }
                                 .border(
                                     width = 1.5.dp,
-                                    color = if (date == selectedDate.value) GrayText else Color.Transparent,
+                                    color = if (date == selectedDate) GrayText else Color.Transparent,
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
@@ -499,23 +465,20 @@ private fun WeekPanel(
 @Composable
 private fun Calendar(
     modifier: Modifier = Modifier,
-    selectedDate: MutableState<LocalDate>,
-    weekType: Boolean,
-    weekList: List<List<LocalDate>>,
+    selectedDate: LocalDate,
     months: List<List<LocalDate>>,
     monthValue: MutableState<Month>,
     pagerMonthStateSaved: MutableState<Int>,
     monthText: MutableState<String>,
     yearText: MutableState<Int>,
-    change: (ScheduleEvent) -> Unit,
-    hideCalendar: () -> Unit,
-    isDarkTheme: Boolean = false
+    changeDate: (LocalDate) -> Unit,
+    hideCalendar: () -> Unit
 ) {
     pagerMonthStateSaved.value = syncPanels(
         months,
         monthValue.value,
         yearText.value,
-        selectedDate.value
+        selectedDate
     )
 
     val pagerState = rememberPagerState(
@@ -524,7 +487,7 @@ private fun Calendar(
         pageCount = { months.size }
     )
 
-    LaunchedEffect(key1 = pagerState) {
+    LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             pagerMonthStateSaved.value = page
 
@@ -577,13 +540,10 @@ private fun Calendar(
                     WeekRow(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        weekType = weekType,
-                        weeks = weekList,
                         week = week,
                         selectedDate = selectedDate,
-                        change = change,
-                        hideCalendar = hideCalendar,
-                        isDarkTheme = isDarkTheme
+                        changeDate = changeDate,
+                        hideCalendar = hideCalendar
                     )
                 }
             }
@@ -594,13 +554,10 @@ private fun Calendar(
 @Composable
 private fun WeekRow(
     modifier: Modifier = Modifier,
-    weekType: Boolean,
-    weeks: List<List<LocalDate>>,
     week: List<LocalDate>,
-    selectedDate: MutableState<LocalDate>,
-    change: (ScheduleEvent) -> Unit,
-    hideCalendar: () -> Unit,
-    isDarkTheme: Boolean = false
+    selectedDate: LocalDate,
+    changeDate: (LocalDate) -> Unit,
+    hideCalendar: () -> Unit
 ) {
     var currentDayOfWeek = DayOfWeek.MONDAY
     var currentIndex = 0
@@ -617,11 +574,8 @@ private fun WeekRow(
                     selectedDate = selectedDate,
                     value = week[currentIndex],
                     isEmpty = false,
-                    weekType = weekType,
-                    weeks = weeks,
-                    change = change,
-                    hideCalendar = hideCalendar,
-                    isDarkTheme = isDarkTheme
+                    changeDate = changeDate,
+                    hideCalendar = hideCalendar
                 )
 
                 if (currentIndex != week.size - 1)
@@ -632,11 +586,8 @@ private fun WeekRow(
                     selectedDate = selectedDate,
                     value = week[currentIndex],
                     isEmpty = true,
-                    weekType = weekType,
-                    weeks = weeks,
-                    change = change,
-                    hideCalendar = hideCalendar,
-                    isDarkTheme = isDarkTheme
+                    changeDate = changeDate,
+                    hideCalendar = hideCalendar
                 )
             }
 
@@ -648,14 +599,11 @@ private fun WeekRow(
 
 @Composable
 private fun DayItem(
-    selectedDate: MutableState<LocalDate>,
+    selectedDate: LocalDate,
     value: LocalDate,
     isEmpty: Boolean,
-    weekType: Boolean,
-    weeks: List<List<LocalDate>>,
-    change: (ScheduleEvent) -> Unit,
-    hideCalendar: () -> Unit,
-    isDarkTheme: Boolean = false
+    changeDate: (LocalDate) -> Unit,
+    hideCalendar: () -> Unit
 ) {
 
     val themeMode = LocalColorsPalette.current.themeMode
@@ -675,26 +623,12 @@ private fun DayItem(
                     .size(36.dp)
                     .clip(CircleShape)
                     .clickable {
-
-                        change(
-                            ScheduleEvent.ChangeSchedule(
-                                value.dayOfWeek,
-                                getCurrentTypeWeek(
-                                    weekType,
-                                    getCurrentWeek(weeks, LocalDate.now()),
-                                    getCurrentWeek(weeks, value)
-                                ),
-                                value
-                            )
-                        )
-
-                        selectedDate.value = value
-
+                        changeDate(value)
                         hideCalendar()
                     }
                     .border(
                         width = 1.5.dp,
-                        color = if (value == selectedDate.value) GrayText else Color.Transparent,
+                        color = if (value == selectedDate) GrayText else Color.Transparent,
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -896,11 +830,4 @@ private fun syncPanelRework(
     }
 
     return 0
-}
-
-@Preview
-@PreviewFontScale
-@Composable
-private fun PreviewTopDatePanel() {
-    DatePanel()
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.syndicate.ptkscheduleapp.R
 import com.syndicate.ptkscheduleapp.data.model.LessonItem
+import com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components.PairCard
 import com.syndicate.ptkscheduleapp.ui.theme.FirstThemeBackground
 import com.syndicate.ptkscheduleapp.ui.theme.GrayText
 import com.syndicate.ptkscheduleapp.ui.theme.GrayThirdTheme
@@ -86,7 +87,7 @@ fun ReplacementDialog(
                     )
                 }
 
-                Column(
+                /*Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
@@ -118,7 +119,7 @@ fun ReplacementDialog(
                                     color = MaterialTheme.colorScheme.inversePrimary,
                                     shape = RoundedCornerShape(10.dp)
                                 ),
-                            lessonItem = if (main.isEmpty()) LessonItem(
+                            pairItem = if (main.isEmpty()) LessonItem(
                                 time = replacement[0].time,
                                 isAbsent = true,
                             ) else main[0],
@@ -146,7 +147,7 @@ fun ReplacementDialog(
                                     color = MaterialTheme.colorScheme.inversePrimary,
                                     shape = RoundedCornerShape(10.dp)
                                 ),
-                            lessonList = main,
+                            pairList = main,
                             isDark = isDarkTheme
                         )
 
@@ -188,7 +189,7 @@ fun ReplacementDialog(
                                     color = MaterialTheme.colorScheme.inversePrimary,
                                     shape = RoundedCornerShape(10.dp)
                                 ),
-                            lessonItem = replacement[0],
+                            pairItem = replacement[0],
                             isDark = isDarkTheme
                         )
                     else
@@ -213,10 +214,10 @@ fun ReplacementDialog(
                                     color = MaterialTheme.colorScheme.inversePrimary,
                                     shape = RoundedCornerShape(10.dp)
                                 ),
-                            lessonList = replacement,
+                            pairList = replacement,
                             isDark = isDarkTheme
                         )
-                }
+                }*/
             }
         }
     }

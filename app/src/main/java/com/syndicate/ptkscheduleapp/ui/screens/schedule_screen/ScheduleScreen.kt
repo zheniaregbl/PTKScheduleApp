@@ -55,7 +55,7 @@ import com.syndicate.ptkscheduleapp.info_functions.applyReplacementSchedule
 import com.syndicate.ptkscheduleapp.info_functions.deleteEmptyLesson
 import com.syndicate.ptkscheduleapp.info_functions.fillListReplacementNumber
 import com.syndicate.ptkscheduleapp.info_functions.isNetworkAvailable
-import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.PairCard
+import com.syndicate.ptkscheduleapp.presentation.screens.schedule_screen.components.PairCard
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ReplacementDialog
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.TopDatePanel
 import com.syndicate.ptkscheduleapp.ui.screens.schedule_screen.components.ShimmerItem
@@ -322,44 +322,6 @@ fun ScheduleScreen(
                                         list.add(it)
                                 }
 
-                                PairCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .shadow(
-                                            elevation = 4.dp,
-                                            shape = RoundedCornerShape(10.dp),
-                                            clip = true,
-                                            spotColor = Color.Black.copy(alpha = 0.3f),
-                                            ambientColor = Color.Black.copy(alpha = 0.3f)
-                                        )
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .background(
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                        .border(
-                                            width = 2.dp,
-                                            color = MaterialTheme.colorScheme.inversePrimary,
-                                            shape = RoundedCornerShape(10.dp)
-                                        )
-                                        .clickable {
-                                            if (panelState.value == PanelState.WeekPanel) {
-
-                                                if (item.pairNumber in replacementPairNumbers) {
-                                                    replacementDialogShow = true
-
-                                                    mainLesson = list
-                                                    replacementLesson = listOf(item)
-                                                }
-                                            } else {
-                                                panelState.value = PanelState.WeekPanel
-                                            }
-                                        },
-                                    lessonItem = item,
-                                    isDark = isDarkTheme,
-                                    isReplacement = item.pairNumber in replacementPairNumbers,
-                                    replacement = list
-                                )
-
                                 if (index != currentSchedule.lastIndex)
                                     Spacer(
                                         modifier = Modifier
@@ -381,46 +343,6 @@ fun ScheduleScreen(
                                 ) {
 
                                     val lessons = listSeveralLessons
-
-                                    PairCard(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .shadow(
-                                                elevation = 4.dp,
-                                                shape = RoundedCornerShape(10.dp),
-                                                clip = true,
-                                                spotColor = if (isDarkTheme) Color.Transparent
-                                                else Color.Black.copy(alpha = 0.3f),
-                                                ambientColor = if (isDarkTheme) Color.Transparent
-                                                else Color.Black.copy(alpha = 0.3f)
-                                            )
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(
-                                                color = MaterialTheme.colorScheme.onPrimary
-                                            )
-                                            .border(
-                                                width = 2.dp,
-                                                color = MaterialTheme.colorScheme.inversePrimary,
-                                                shape = RoundedCornerShape(10.dp)
-                                            )
-                                            .clickable {
-                                                if (panelState.value == PanelState.WeekPanel) {
-
-                                                    if (item.pairNumber in replacementPairNumbers) {
-                                                        replacementDialogShow = true
-
-                                                        mainLesson = list
-                                                        replacementLesson = lessons
-                                                    }
-                                                } else {
-                                                    panelState.value = PanelState.WeekPanel
-                                                }
-                                            },
-                                        lessonList = listSeveralLessons,
-                                        isDark = isDarkTheme,
-                                        isReplacement = item.pairNumber in replacementPairNumbers,
-                                        replacement = list
-                                    )
 
                                     if (index != currentSchedule.lastIndex)
                                         Spacer(

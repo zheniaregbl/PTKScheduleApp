@@ -3,6 +3,7 @@ package com.syndicate.ptkscheduleapp.view_model.schedule_view_model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.syndicate.ptkscheduleapp.common.utils.ScheduleUtils
 import com.syndicate.ptkscheduleapp.data.repository.ReworkScheduleRepositoryImpl
 import com.syndicate.ptkscheduleapp.domain.model.PairItem
 import com.syndicate.ptkscheduleapp.domain.model.RequestState
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.Month
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,9 +30,51 @@ class ReworkScheduleViewModel @Inject constructor(
     private val _schedule: MutableStateFlow<RequestState<List<List<PairItem>>>> = MutableStateFlow(RequestState.Loading)
     val schedule: StateFlow<RequestState<List<List<PairItem>>>> = _schedule.asStateFlow()
 
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+
+    private val _currentSchedulePage = MutableStateFlow(0)
+    val currentSchedulePage: StateFlow<Int> = _currentSchedulePage.asStateFlow()
+
+    private val _previousSchedulePage = MutableStateFlow(0)
+    val previousSchedulePage: StateFlow<Int> = _previousSchedulePage.asStateFlow()
+
     init {
+        initCurrentSchedulePage()
         getCurrentWeekType()
         getSchedule()
+    }
+
+    fun onEvent(event: ReworkScheduleEvent) {
+
+        when (event) {
+
+            is ReworkScheduleEvent.ChangeSelectedDate -> _selectedDate.update { event.date }
+
+            is ReworkScheduleEvent.ChangeSchedulePage -> {
+
+                val previousValue = _currentSchedulePage.value
+
+                _previousSchedulePage.update { if (it != previousValue) previousValue else it }
+                _currentSchedulePage.update { event.page }
+            }
+        }
+    }
+
+    private fun initCurrentSchedulePage() {
+
+        val weeks = ScheduleUtils.getWeeksFromStartDate(
+            LocalDate.of(LocalDate.now().year, Month.JANUARY, 1),
+            78
+        )
+
+        val initWeekNumber = ScheduleUtils.getCurrentWeek(
+            weeks,
+            _selectedDate.value
+        )
+        val initPage = (initWeekNumber * 7) + weeks[initWeekNumber].indexOf(_selectedDate.value)
+
+        _currentSchedulePage.update { initPage }
     }
 
     private fun getCurrentWeekType() {
@@ -76,12 +121,8 @@ class ReworkScheduleViewModel @Inject constructor(
                                 result
                                     .getSuccessData()
                                     .listPair
-                                    .filter {
-                                        it.subject != ""
-                                    }
-                                    .map {
-                                        it.toPairItem()
-                                    }
+                                    .filter { it.subject != "" }
+                                    .map { it.toPairItem() }
                             )
                         )
                     }
