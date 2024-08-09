@@ -15,6 +15,7 @@ hiltNavigation = "1.2.0"
 composeDestinations = "1.10.2"
 retrofitVersion = "2.9.0"
 composeLoadingVersion = "1.0.4"
+moshiVersion = "1.15.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,8 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofitVersion" }
 
 compose-loading = { group = "com.github.commandiron", name = "ComposeLoading", version.ref = "composeLoadingVersion" }
+
+moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

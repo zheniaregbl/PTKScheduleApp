@@ -214,8 +214,6 @@ fun ScheduleScreenContent(
 
         snapshotFlow { schedulePagerState.currentPage }.collect { page ->
 
-            Log.d("schedulePagerState", "schedulePagerState.currentPage")
-
             val weekNumber = page / 7
             val indexInWeek = page % 7
 
@@ -363,14 +361,6 @@ fun ScheduleScreenContent(
                                         )
                                     }
 
-                                    item {
-                                        Text(
-                                            text = "${
-                                                LocalDate.of(2024, 1, 1).plusDays(page.toLong())
-                                            }"
-                                        )
-                                    }
-
                                     itemsIndexed(
                                         items = currentSchedule,
                                         key = { index, _ ->
@@ -464,9 +454,7 @@ fun ScheduleScreenContent(
                                 ) {
 
                                     Text(
-                                        text = "Нет занятий ${
-                                            LocalDate.of(2024, 1, 1).plusDays(page.toLong())
-                                        }",
+                                        text = "Нет занятий",
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 24.sp,

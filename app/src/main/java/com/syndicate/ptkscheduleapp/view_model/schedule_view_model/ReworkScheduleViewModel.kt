@@ -1,9 +1,16 @@
 package com.syndicate.ptkscheduleapp.view_model.schedule_view_model
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.adapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.syndicate.ptkscheduleapp.common.utils.ScheduleUtils
+import com.syndicate.ptkscheduleapp.data.model.response.PairObject
 import com.syndicate.ptkscheduleapp.data.repository.ReworkScheduleRepositoryImpl
 import com.syndicate.ptkscheduleapp.domain.model.PairItem
 import com.syndicate.ptkscheduleapp.domain.model.RequestState
@@ -21,7 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReworkScheduleViewModel @Inject constructor(
-    private val repository: ReworkScheduleRepositoryImpl
+    private val repository: ReworkScheduleRepositoryImpl,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _isUpperWeek: MutableStateFlow<RequestState<Boolean>> = MutableStateFlow(RequestState.Idle)
@@ -86,6 +94,12 @@ class ReworkScheduleViewModel @Inject constructor(
             repository.getCurrentWeekType().also { result ->
 
                 if (result.isSuccess()) {
+
+                    sharedPreferences
+                        .edit()
+                        .putBoolean("local_week_type", result.getSuccessData().isUpper)
+                        .apply()
+
                     _isUpperWeek.update {
                         RequestState.Success(
                             result
@@ -95,9 +109,9 @@ class ReworkScheduleViewModel @Inject constructor(
                     }
                 } else if (result.isError()) {
                     _isUpperWeek.update {
-                        RequestState.Error(
-                            result
-                                .getErrorMessage()
+                        RequestState.Success(
+                            sharedPreferences
+                                .getBoolean("local_week_type", false)
                         )
                     }
                 }
@@ -115,6 +129,8 @@ class ReworkScheduleViewModel @Inject constructor(
 
                 if (result.isSuccess()) {
 
+                    updateLocalSchedule(result.getSuccessData().listPair)
+
                     _schedule.update {
                         RequestState.Success(
                             getWeekSchedule(
@@ -127,11 +143,38 @@ class ReworkScheduleViewModel @Inject constructor(
                         )
                     }
 
-                } else {
-                    Log.d("scheduleResponse", result.getErrorMessage())
+                } else if (result.isError()) {
+
+                    val localSchedule = getScheduleFromSharedPreferences()
+
+                    _schedule.update {
+                        RequestState.Success(
+                            getWeekSchedule(
+                                localSchedule
+                                    .filter { it.subject != "" }
+                                    .map { it.toPairItem() }
+                            )
+                        )
+                    }
                 }
             }
         }
+    }
+
+    private fun getScheduleFromSharedPreferences(): List<PairObject> {
+
+        val localSchedule = PairObjectUtils
+            .jsonAdapter
+            .fromJson(sharedPreferences.getString("local_schedule", "")!!)
+
+        return localSchedule as List<PairObject>
+    }
+
+    private fun updateLocalSchedule(schedule: List<PairObject>) {
+
+        val localSchedule = PairObjectUtils.jsonAdapter.toJson(schedule)
+
+        sharedPreferences.edit().putString("local_schedule", localSchedule).apply()
     }
 
     private fun getWeekSchedule(listPair: List<PairItem>): List<List<PairItem>> {
@@ -167,4 +210,13 @@ class ReworkScheduleViewModel @Inject constructor(
 
         return schedule
     }
+}
+
+object PairObjectUtils {
+
+    private val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+    private val type = Types.newParameterizedType(List::class.java, PairObject::class.java)
+    val jsonAdapter: JsonAdapter<List<PairObject>> = moshi.adapter(type)
 }

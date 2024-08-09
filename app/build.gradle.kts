@@ -106,4 +106,7 @@ dependencies {
 
     // ComposeLoading
     implementation(libs.compose.loading)
+
+    // Moshi
+    implementation(libs.moshi)
 }
